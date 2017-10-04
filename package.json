@@ -1,0 +1,37 @@
+{
+  "name": "smoke-screen",
+  "version": "1.0.0",
+  "description": "TODO",
+  "main": "main.js",
+  "scripts": {
+    "test": "mocha dist/test",
+    "compile": "tsc -p .",
+    "clean": "rm -rf dist",
+    "lint": "tslint -c tslint.json 'src/**/*.ts' && tslint -c tslint.json 'test/**/*.ts'",
+    "clean-compile": "npm run clean && npm run compile"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/avivcarmis/smoke-screen.git"
+  },
+  "keywords": [
+    "TODO"
+  ],
+  "author": "Aviv Carmi",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/avivcarmis/smoke-screen/issues"
+  },
+  "homepage": "https://github.com/avivcarmis/smoke-screen#readme",
+  "dependencies": {
+    "to-case": "^2.0.0"
+  },
+  "devDependencies": {
+    "@types/joi": "^10.4.3",
+    "chai": "^4.1.2",
+    "mocha": "^3.5.3",
+    "ts-node": "^3.3.0",
+    "tslint": "^5.7.0",
+    "typescript": "^2.5.3"
+  }
+}
