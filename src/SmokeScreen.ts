@@ -1,11 +1,14 @@
-import {Constructable, Type} from "./interfaces";
+import {Constructable, ExposureSettings, NamingTranslator} from "./interfaces";
 import {ReflectionMetadata} from "./ReflectionMetadata";
 
-function instanceOfType(object: any): object is Type {
-    return typeof object.validate == "function";
+function isConstructable(object: any): object is Constructable<any> {
+    return typeof object === 'function'
+        && /^class\s/.test(Function.prototype.toString.call(object));
 }
 
 export class SmokeScreen {
+
+    constructor(private readonly namingTranslator: NamingTranslator | null = null) {}
 
     toJSON(object: any) {
         return JSON.stringify(this.toObject(object));
@@ -24,11 +27,16 @@ export class SmokeScreen {
                 if (!exposureSettings) {
                     continue;
                 }
-                const externalName = exposureSettings.as ? exposureSettings.as : key;
                 let value = object[key];
-                if (exposureSettings.type && !instanceOfType(exposureSettings.type)) {
-                    value = this.toObject(value);
+                if (exposureSettings.type) {
+                    if (isConstructable(exposureSettings.type)) {
+                        value = this.toObject(value);
+                    }
+                    else {
+                        value = exposureSettings.type.translateOutput(value);
+                    }
                 }
+                const externalName = this.translate(key, exposureSettings);
                 exposure[externalName] = value;
             }
         }
@@ -45,7 +53,7 @@ export class SmokeScreen {
                 if (!exposureSettings) {
                     continue;
                 }
-                const externalName = exposureSettings.as ? exposureSettings.as : key;
+                const externalName = this.translate(key, exposureSettings);
                 let value = exposure[externalName];
                 if (value === null || typeof value === "undefined") {
                     errors.push(`property '${externalName}' is missing missing`);
@@ -53,11 +61,11 @@ export class SmokeScreen {
                 }
                 if (exposureSettings.type) {
                     try {
-                        if (instanceOfType(exposureSettings.type)) {
-                            value = exposureSettings.type.validate(value);
+                        if (isConstructable(exposureSettings.type)) {
+                            value = this.fromObject(value, exposureSettings.type);
                         }
                         else {
-                            value = this.fromObject(value, exposureSettings.type);
+                            value = exposureSettings.type.translateInput(value);
                         }
                     } catch (e) {
                         errors.push(`property '${externalName}' ${e.message}`);
@@ -79,6 +87,16 @@ export class SmokeScreen {
             }
         }
         return instance;
+    }
+
+    private translate(key: string, exposureSettings: ExposureSettings) {
+        if (exposureSettings.as) {
+            return exposureSettings.as;
+        }
+        if (this.namingTranslator) {
+            return this.namingTranslator(key);
+        }
+        return key;
     }
 
 }

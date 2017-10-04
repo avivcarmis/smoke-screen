@@ -1,50 +1,59 @@
 import {SmokeScreen} from "./SmokeScreen";
 import {exposed} from "./interfaces";
-import {Types} from "./Types";
+import {PropertyTypes} from "./PropertyTypes";
+import {NamingTranslators} from "./NamingTranslators";
 
 class Pet {
 
     @exposed()
-    name: string;
+    theName: string;
 
-    petbla: boolean;
+    petBla: boolean;
 
+}
+
+enum XMLParser {
+    BLA, IO
 }
 
 class Person {
 
-    @exposed({type: Types.string})
-    name: string;
+    @exposed({type: PropertyTypes.string})
+    personName: string;
 
-    @exposed({as: "the-age", type: Types.number})
+    @exposed({as: "the-age", type: PropertyTypes.number})
     age: number;
 
     @exposed({type: Pet})
     pet: Pet;
 
-    bla: boolean;
+    @exposed({type: PropertyTypes.enumOf(XMLParser)})
+    myXMLParser: XMLParser;
+
+    personBla: boolean;
 
 }
 
-const smokeScreen = new SmokeScreen();
+const smokeScreen = new SmokeScreen(NamingTranslators.lowerSnakeCaseTranslator);
 const pet = new Pet();
-pet.name = "zadik";
-pet.petbla = true;
+pet.theName = "zadik";
+pet.petBla = true;
 const person = new Person();
-person.name = "aviv";
+person.personName = "aviv";
 person.age = 12;
 person.pet = pet;
-person.bla = true;
+person.personBla = true;
+person.myXMLParser = XMLParser.BLA;
 
-const blabla = smokeScreen.toJSON(person);
-// noinspection TsLint
-console.log(blabla);
-
-// try {
-//     const ioooo = smokeScreen.fromJSON("{\"name\":\"bka\",\"the-age\":12,\"bla\":1234,\"pet\":{\"name\":\"zadik\",\"petbla\":121212}}", Person);
+// const blabla = smokeScreen.toJSON(person);
 // // noinspection TsLint
-//     console.log(ioooo);
-// } catch (e) {
-//     // noinspection TsLint
-//     debugger;
-// }
+// console.log(blabla);
+
+try {
+    const ioooo = smokeScreen.fromJSON("{\"person_name\":\"aviv\",\"the-age\":12,\"pet\":{\"the_name\":\"zadik\",\"pet_bla\":true},\"my_xml_parser\":\"ioi\",\"person_bla\":\"dasdsa\"}", Person);
+// noinspection TsLint
+    console.log(ioooo);
+} catch (e) {
+    // noinspection TsLint
+    debugger;
+}

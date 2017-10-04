@@ -1,14 +1,9 @@
 import * as to from "to-case";
-import {NamingTranslator} from "./interfaces";
 
 export namespace NamingTranslators {
-
-    export abstract class ToCaseBasedTranslator implements NamingTranslator {
-
-        constructor(private readonly _translator: (input: string) => string) {
-        }
-
-        translate(propertyName: string): string {
+    
+    function constructByToCase(toCaseFunction: (input: string) => string) {
+        return (propertyName: string) => {
             // first, normalize sequences of uppercase to prevent
             // separating 'myXMLParser' to 'my_x_m_l_parser'
             // rather than 'my_xml_parser
@@ -38,49 +33,19 @@ export namespace NamingTranslators {
                 }
             }
             // now translate
-            return this._translator(normalized);
-        }
-
+            return toCaseFunction(normalized);
+        };
     }
 
-    export class UpperCamelCaseTranslator extends ToCaseBasedTranslator {
+    export const upperCamelCaseTranslator = constructByToCase(to.pascal);
 
-        constructor() {
-            super(to.pascal);
-        }
+    export const lowerSnakeCaseTranslator = constructByToCase(to.snake);
 
-    }
+    export const upperSnakeCaseTranslator = constructByToCase(to.constant);
 
-    export class LowerSnakeCaseTranslator extends ToCaseBasedTranslator {
+    export const lowerKebabCaseTranslator = constructByToCase(to.slug);
 
-        constructor() {
-            super(to.snake);
-        }
-
-    }
-
-    export class UpperSnakeCaseTranslator extends ToCaseBasedTranslator {
-
-        constructor() {
-            super(to.constant);
-        }
-
-    }
-
-    export class LowerKebabCaseTranslator extends ToCaseBasedTranslator {
-
-        constructor() {
-            super(to.slug);
-        }
-
-    }
-
-    export class UpperKebabCaseTranslator extends ToCaseBasedTranslator {
-
-        constructor() {
-            super(s => to.slug(s).toUpperCase());
-        }
-
-    }
+    export const upperKebabCaseTranslator = constructByToCase(s =>
+        to.slug(s).toUpperCase());
 
 }

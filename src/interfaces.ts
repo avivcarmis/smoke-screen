@@ -1,14 +1,12 @@
 import {ReflectionMetadata} from "./ReflectionMetadata";
 
-export interface Type {
+export type NamingTranslator = (propertyName: string) => string;
 
-    validate(value: any): any;
+export interface PropertyType {
 
-}
+    translateOutput(value: any): any;
 
-export interface NamingTranslator {
-
-    translate(propertyName: string): string;
+    translateInput(value: any): any;
 
 }
 
@@ -16,7 +14,7 @@ export interface ExposureSettings {
 
     as?: string;
 
-    type?: Type | Constructable<any>;
+    type?: PropertyType | Constructable<any>;
 
     validator?: (value: any) => any;
 
