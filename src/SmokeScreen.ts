@@ -53,8 +53,22 @@ export class SmokeScreen {
                 }
                 const externalName = this.translate(key, exposureSettings);
                 let value = exposure[externalName];
-                if (value === null || typeof value === "undefined") {
-                    errors.push(`property '${externalName}' is missing missing`);
+                if (typeof value === "undefined") {
+                    if (exposureSettings.defaultValue) {
+                        value = exposureSettings.defaultValue;
+                    }
+                    else {
+                        errors.push(`property '${externalName}' is missing missing`);
+                        continue;
+                    }
+                }
+                if (value === null) {
+                    if (exposureSettings.nullable) {
+                        (instance as any)[key] = null;
+                    }
+                    else {
+                        errors.push(`property '${externalName}' may not be null`);
+                    }
                     continue;
                 }
                 if (exposureSettings.type) {

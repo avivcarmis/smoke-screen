@@ -117,4 +117,71 @@ describe("Test exposure settings", () => {
 
     });
 
+    describe("Test default value", () => {
+
+        it("Test required property", () => {
+
+            class Test {
+
+                @exposed
+                property: string;
+
+            }
+
+            const smokeScreen = new SmokeScreen();
+            expect(() => smokeScreen.fromObject({}, Test)).to.throw(Error);
+
+        });
+
+        it("Test optional property", () => {
+
+            class Test {
+
+                @exposed({defaultValue: "value1"})
+                property: string;
+
+            }
+
+            const smokeScreen = new SmokeScreen();
+            const test = smokeScreen.fromObject({}, Test);
+            expect(test.property).to.equal("value1");
+
+        });
+
+    });
+
+    describe("Test nullable", () => {
+
+        it("Test nullable success", () => {
+
+            class Test {
+
+                @exposed
+                property: string;
+
+            }
+
+            const smokeScreen = new SmokeScreen();
+            expect(() => smokeScreen.fromObject({property: null}, Test))
+                .to.throw(Error);
+
+        });
+
+        it("Test optional property", () => {
+
+            class Test {
+
+                @exposed({nullable: true})
+                property: string;
+
+            }
+
+            const smokeScreen = new SmokeScreen();
+            const test = smokeScreen.fromObject({property: null}, Test);
+            expect(test.property).to.equal(null);
+
+        });
+
+    });
+
 });

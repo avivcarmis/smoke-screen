@@ -19,6 +19,10 @@ export interface ExposureSettings {
 
     validator?: (value: any) => any;
 
+    defaultValue?: any;
+
+    nullable?: boolean;
+
 }
 
 export interface Constructable<T> {

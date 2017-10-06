@@ -16,7 +16,7 @@ describe("Test unexposed properties", () => {
 
     const smokeScreen = new SmokeScreen();
 
-    it("Test unexposed serialization", () => {
+    it("Test toObject", () => {
 
         const test = new Test();
         test.exposed = "exposed";
@@ -27,10 +27,30 @@ describe("Test unexposed properties", () => {
 
     });
 
-    it("Test unexposed deserialization", () => {
+    it("Test fromObject", () => {
 
         const exposure = {exposed: "exposed", unexposed: "unexposed"};
         const test = smokeScreen.fromObject(exposure, Test);
+        expect(test.exposed).to.equal("exposed");
+        expect(test).to.not.haveOwnProperty("unexposed");
+
+    });
+
+    it("Test toJSON", () => {
+
+        const test = new Test();
+        test.exposed = "exposed";
+        test.unexposed = "unexposed";
+        const exposure = JSON.parse(smokeScreen.toJSON(test));
+        expect(exposure.exposed).to.equal("exposed");
+        expect(exposure).to.not.haveOwnProperty("unexposed");
+
+    });
+
+    it("Test fromJSON", () => {
+
+        const exposure = {exposed: "exposed", unexposed: "unexposed"};
+        const test = smokeScreen.fromJSON(JSON.stringify(exposure), Test);
         expect(test.exposed).to.equal("exposed");
         expect(test).to.not.haveOwnProperty("unexposed");
 
