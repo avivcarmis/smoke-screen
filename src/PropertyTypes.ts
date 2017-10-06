@@ -1,12 +1,13 @@
-import {PropertyType} from "./interfaces";
+import {Constructable, isConstructable, PropertyType} from "./interfaces";
+import {SmokeScreen} from "./SmokeScreen";
 
 class StringType implements PropertyType {
 
-    translateOutput(value: any): any {
+    translateOutput(_smokeScreen: SmokeScreen, value: any): any {
         return value;
     }
 
-    translateInput(value: any): any {
+    translateInput(_smokeScreen: SmokeScreen, value: any): any {
         if (typeof value != "string") {
             throw new Error("must be a string");
         }
@@ -17,11 +18,11 @@ class StringType implements PropertyType {
 
 class NumberType implements PropertyType {
 
-    translateOutput(value: any): any {
+    translateOutput(_smokeScreen: SmokeScreen, value: any): any {
         return value;
     }
 
-    translateInput(value: any): any {
+    translateInput(_smokeScreen: SmokeScreen, value: any): any {
         if (typeof value != "number") {
             throw new Error("must be a number");
         }
@@ -32,11 +33,11 @@ class NumberType implements PropertyType {
 
 class BooleanType implements PropertyType {
 
-    translateOutput(value: any): any {
+    translateOutput(_smokeScreen: SmokeScreen, value: any): any {
         return value;
     }
 
-    translateInput(value: any): any {
+    translateInput(_smokeScreen: SmokeScreen, value: any): any {
         if (typeof value != "boolean") {
             throw new Error("must be a boolean");
         }
@@ -45,16 +46,16 @@ class BooleanType implements PropertyType {
 
 }
 
-class EnumOfType<T> implements PropertyType {
+class EnumType<T> implements PropertyType {
 
     constructor(private readonly _enumClass: T,
                 private readonly _caseSensitive = false) {}
 
-    translateOutput(value: any): any {
+    translateOutput(_smokeScreen: SmokeScreen, value: any): any {
         return (this._enumClass as any)[value];
     }
 
-    translateInput(value: any): any {
+    translateInput(_smokeScreen: SmokeScreen, value: any): any {
         if (this._caseSensitive) {
             const result = (this._enumClass as any)[value];
             if (typeof result != "undefined") {
@@ -85,24 +86,36 @@ class EnumOfType<T> implements PropertyType {
 
 class ArrayType implements PropertyType {
 
-    constructor(private readonly _itemType: PropertyType) {}
+    constructor(private readonly _itemType: PropertyType | Constructable<any>) {}
 
-    translateOutput(value: any): any {
+    translateOutput(_smokeScreen: SmokeScreen, value: any): any {
         return value;
     }
 
-    translateInput(value: any): any {
+    translateInput(_smokeScreen: SmokeScreen, value: any): any {
         if (!(value instanceof Array)) {
             throw new Error("must be an array");
         }
-        try {
-            for (const item of value) {
-                this._itemType.translateInput(item);
+        const result = [];
+        for (const item of value) {
+            let translated;
+            if (isConstructable(this._itemType)) {
+                try {
+                    translated = _smokeScreen.fromObject(item, this._itemType);
+                } catch (e) {
+                    throw new Error("array parsing error: " + e.message);
+                }
             }
-        } catch (e) {
-            throw new Error("all items of the array " + e.message);
+            else {
+                try {
+                    translated = this._itemType.translateInput(_smokeScreen, item);
+                } catch (e) {
+                    throw new Error("all items of the array " + e.message);
+                }
+            }
+            result.push(translated);
         }
-        return value;
+        return result;
     }
 
 }
@@ -116,15 +129,9 @@ export namespace PropertyTypes {
     export const boolean = new BooleanType();
 
     export const enumOf = <T>(enumClass: T, caseSensitive = false) =>
-        new EnumOfType(enumClass, caseSensitive);
+        new EnumType(enumClass, caseSensitive);
 
-    export const stringArray = new ArrayType(string);
-
-    export const numberArray = new ArrayType(number);
-
-    export const booleanArray = new ArrayType(boolean);
-
-    export const enumArrayOf = <T>(enumClass: T, caseSensitive = false) =>
-        new ArrayType(enumOf(enumClass, caseSensitive));
+    export const arrayOf = (itemType: PropertyType | Constructable<any>) =>
+        new ArrayType(itemType);
 
 }

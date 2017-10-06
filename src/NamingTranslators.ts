@@ -1,51 +1,39 @@
 import * as to from "to-case";
 
 export namespace NamingTranslators {
+
+    type ToCase = (input: string) => string;
     
-    function constructByToCase(toCaseFunction: (input: string) => string) {
+    function constructByToCase(toCaseFunction: ToCase, preserveCase: boolean) {
         return (propertyName: string) => {
-            // first, normalize sequences of uppercase to prevent
-            // separating 'myXMLParser' to 'my_x_m_l_parser'
-            // rather than 'my_xml_parser
-            let normalized = "";
-            let upperSequence = "";
-            for (const c of propertyName) {
-                if (c !== c.toLowerCase()) {
-                    // upper case
-                    upperSequence += c;
-                }
-                else {
-                    if (upperSequence.length === 1) {
-                        normalized += upperSequence;
-                        upperSequence = "";
-                    }
-                    else if (upperSequence.length > 1) {
-                        // finished upper sequence
-                        normalized += upperSequence
-                            .charAt(0).toUpperCase();
-                        normalized += upperSequence
-                            .substr(1, upperSequence.length - 2).toLowerCase();
-                        normalized += upperSequence
-                            .charAt(upperSequence.length - 1).toUpperCase();
-                        upperSequence = ""
-                    }
-                    normalized += c;
-                }
+            // remove $ or _ from the start
+            propertyName = propertyName.replace(/^([_$])*/, "");
+            if (!preserveCase) {
+                // if output should preserve the original case, we want to
+                // normalize sequences of uppercase letters to prevent
+                // separating 'myXMLParser' to 'my_x_m_l_parser'
+                // rather than 'my_xml_parser
+                propertyName = propertyName
+                    .replace(/([a-z])([A-Z])/g, '$1 $2')
+                    .replace(/([A-Z])([a-z])/g, ' $1$2')
+                    .split(" ")
+                    .map(s => s.charAt(0).toUpperCase() +
+                        s.substr(1).toLowerCase())
+                    .join("");
             }
-            // now translate
-            return toCaseFunction(normalized);
+            return toCaseFunction(propertyName);
         };
     }
 
-    export const upperCamelCaseTranslator = constructByToCase(to.pascal);
+    export const upperCamelCase = constructByToCase(to.pascal, true);
 
-    export const lowerSnakeCaseTranslator = constructByToCase(to.snake);
+    export const lowerSnakeCase = constructByToCase(to.snake, false);
 
-    export const upperSnakeCaseTranslator = constructByToCase(to.constant);
+    export const upperSnakeCase = constructByToCase(to.constant, false);
 
-    export const lowerKebabCaseTranslator = constructByToCase(to.slug);
+    export const lowerKebabCase = constructByToCase(to.slug, false);
 
-    export const upperKebabCaseTranslator = constructByToCase(s =>
-        to.slug(s).toUpperCase());
+    export const upperKebabCase = constructByToCase(s =>
+        to.slug(s).toUpperCase(), false);
 
 }

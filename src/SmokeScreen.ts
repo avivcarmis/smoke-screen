@@ -1,10 +1,8 @@
-import {Constructable, ExposureSettings, NamingTranslator} from "./interfaces";
+import {
+    Constructable, ExposureSettings, isConstructable,
+    NamingTranslator
+} from "./interfaces";
 import {ReflectionMetadata} from "./ReflectionMetadata";
-
-function isConstructable(object: any): object is Constructable<any> {
-    return typeof object === 'function'
-        && /^class\s/.test(Function.prototype.toString.call(object));
-}
 
 export class SmokeScreen {
 
@@ -18,7 +16,7 @@ export class SmokeScreen {
         return this.fromObject(JSON.parse(json), instanceClass);
     }
 
-    toObject(object: {[key: string]: any}) {
+    toObject(object: any): {[key: string]: any} {
         const exposure: any = {};
         const reflectionMetadata = ReflectionMetadata.extract(object);
         if (reflectionMetadata) {
@@ -33,7 +31,7 @@ export class SmokeScreen {
                         value = this.toObject(value);
                     }
                     else {
-                        value = exposureSettings.type.translateOutput(value);
+                        value = exposureSettings.type.translateOutput(this, value);
                     }
                 }
                 const externalName = this.translate(key, exposureSettings);
@@ -45,7 +43,7 @@ export class SmokeScreen {
 
     fromObject<T>(exposure: {[key: string]: any}, instanceClass: Constructable<T>) {
         const errors = [];
-        const instance = new instanceClass(); // TODO lookup params
+        const instance = new instanceClass();
         const reflectionMetadata = ReflectionMetadata.extract(instance);
         if (reflectionMetadata) {
             for (const key of reflectionMetadata.getPropertyKeys()) {
@@ -65,7 +63,7 @@ export class SmokeScreen {
                             value = this.fromObject(value, exposureSettings.type);
                         }
                         else {
-                            value = exposureSettings.type.translateInput(value);
+                            value = exposureSettings.type.translateInput(this, value);
                         }
                     } catch (e) {
                         errors.push(`property '${externalName}' ${e.message}`);
