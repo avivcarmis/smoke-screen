@@ -2,7 +2,14 @@
   "name": "smoke-screen",
   "version": "1.0.0",
   "description": "TODO",
-  "main": "main.js",
+  "engines": {
+    "node": ">=6.11.2"
+  },
+  "main": "dist/src/main.js",
+  "types": "dist/src/main.d.ts",
+  "directories": {
+    "test": "test"
+  },
   "scripts": {
     "clean": "rm -rf dist",
     "compile": "tsc -p .",
