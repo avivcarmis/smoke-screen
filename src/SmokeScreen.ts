@@ -29,8 +29,7 @@ export class SmokeScreen {
                 if (exposureSettings.type) {
                     if (isConstructable(exposureSettings.type)) {
                         value = this.toObject(value);
-                    }
-                    else {
+                    } else {
                         value = exposureSettings.type.translateOutput(this, value);
                     }
                 }
@@ -56,8 +55,7 @@ export class SmokeScreen {
                 if (typeof value === "undefined") {
                     if (exposureSettings.defaultValue) {
                         value = exposureSettings.defaultValue;
-                    }
-                    else {
+                    } else {
                         errors.push(`property '${externalName}' is missing missing`);
                         continue;
                     }
@@ -65,8 +63,7 @@ export class SmokeScreen {
                 if (value === null) {
                     if (exposureSettings.nullable) {
                         (instance as any)[key] = null;
-                    }
-                    else {
+                    } else {
                         errors.push(`property '${externalName}' may not be null`);
                     }
                     continue;
@@ -75,8 +72,7 @@ export class SmokeScreen {
                     try {
                         if (isConstructable(exposureSettings.type)) {
                             value = this.fromObject(value, exposureSettings.type);
-                        }
-                        else {
+                        } else {
                             value = exposureSettings.type.translateInput(this, value);
                         }
                     } catch (e) {

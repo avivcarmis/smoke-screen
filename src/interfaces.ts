@@ -32,7 +32,7 @@ export interface Constructable<T> {
 }
 
 export function isConstructable(object: any): object is Constructable<any> {
-    return typeof object === 'function'
+    return typeof object === "function"
         && /^class\s/.test(Function.prototype.toString.call(object));
 }
 
@@ -48,8 +48,7 @@ export function exposed(a: any, b?: string): any {
     }
     if (b) {
         getDecorator({})(a, b);
-    }
-    else {
+    } else {
         return getDecorator(a || {});
     }
 }

@@ -3,7 +3,7 @@ import * as to from "to-case";
 export namespace NamingTranslators {
 
     type ToCase = (input: string) => string;
-    
+
     function constructByToCase(toCaseFunction: ToCase, preserveCase: boolean) {
         return (propertyName: string) => {
             // remove $ or _ from the start
@@ -14,8 +14,8 @@ export namespace NamingTranslators {
                 // separating 'myXMLParser' to 'my_x_m_l_parser'
                 // rather than 'my_xml_parser
                 propertyName = propertyName
-                    .replace(/([a-z])([A-Z])/g, '$1 $2')
-                    .replace(/([A-Z])([a-z])/g, ' $1$2')
+                    .replace(/([a-z])([A-Z])/g, "$1 $2")
+                    .replace(/([A-Z])([a-z])/g, " $1$2")
                     .split(" ")
                     .map(s => s.charAt(0).toUpperCase() +
                         s.substr(1).toLowerCase())

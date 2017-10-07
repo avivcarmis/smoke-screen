@@ -8,7 +8,7 @@ class StringType implements PropertyType {
     }
 
     translateInput(_smokeScreen: SmokeScreen, value: any): any {
-        if (typeof value != "string") {
+        if (typeof value !== "string") {
             throw new Error("must be a string");
         }
         return value;
@@ -23,7 +23,7 @@ class NumberType implements PropertyType {
     }
 
     translateInput(_smokeScreen: SmokeScreen, value: any): any {
-        if (typeof value != "number") {
+        if (typeof value !== "number") {
             throw new Error("must be a number");
         }
         return value;
@@ -38,7 +38,7 @@ class BooleanType implements PropertyType {
     }
 
     translateInput(_smokeScreen: SmokeScreen, value: any): any {
-        if (typeof value != "boolean") {
+        if (typeof value !== "boolean") {
             throw new Error("must be a boolean");
         }
         return value;
@@ -58,13 +58,12 @@ class EnumType<T> implements PropertyType {
     translateInput(_smokeScreen: SmokeScreen, value: any): any {
         if (this._caseSensitive) {
             const result = (this._enumClass as any)[value];
-            if (typeof result != "undefined") {
+            if (typeof result !== "undefined") {
                 return result;
             }
-        }
-        else {
+        } else {
             for (const key of this.getAllKeys()) {
-                if (key.toLowerCase() == value.trim().toLowerCase()) {
+                if (key.toLowerCase() === value.trim().toLowerCase()) {
                     return (this._enumClass as any)[key];
                 }
             }
@@ -105,8 +104,7 @@ class ArrayType implements PropertyType {
                 } catch (e) {
                     throw new Error("array parsing error: " + e.message);
                 }
-            }
-            else {
+            } else {
                 try {
                     translated = this._itemType.translateInput(_smokeScreen, item);
                 } catch (e) {
@@ -122,11 +120,11 @@ class ArrayType implements PropertyType {
 
 export namespace PropertyTypes {
 
-    export const string = new StringType();
+    export const string = new StringType();     // tslint:disable-line
 
-    export const number = new NumberType();
+    export const number = new NumberType();     // tslint:disable-line
 
-    export const boolean = new BooleanType();
+    export const boolean = new BooleanType();   // tslint:disable-line
 
     export const enumOf = <T>(enumClass: T, caseSensitive = false) =>
         new EnumType(enumClass, caseSensitive);

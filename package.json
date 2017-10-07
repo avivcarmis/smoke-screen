@@ -4,11 +4,12 @@
   "description": "TODO",
   "main": "main.js",
   "scripts": {
-    "test": "mocha dist/test",
-    "compile": "tsc -p .",
     "clean": "rm -rf dist",
+    "compile": "tsc -p .",
+    "clean-compile": "npm run clean && npm run compile",
     "lint": "tslint -c tslint.json 'src/**/*.ts' && tslint -c tslint.json 'test/**/*.ts'",
-    "clean-compile": "npm run clean && npm run compile"
+    "test": "mocha dist/test",
+    "build-pipeline": "npm run clean-compile && npm run lint && npm test"
   },
   "repository": {
     "type": "git",

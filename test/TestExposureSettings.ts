@@ -104,7 +104,9 @@ describe("Test exposure settings", () => {
 
             class Test {
 
-                @exposed({validator: () => {throw new Error("")}})
+                @exposed({validator: () => {
+                    throw new Error("");
+                }})
                 property: string;
 
             }
