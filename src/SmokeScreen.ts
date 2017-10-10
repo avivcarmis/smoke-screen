@@ -1,7 +1,4 @@
-import {
-    Constructable, ExposureSettings, isConstructable,
-    NamingTranslator
-} from "./interfaces";
+import {Constructable, ExposureSettings, NamingTranslator} from "./interfaces";
 import {ReflectionMetadata} from "./ReflectionMetadata";
 
 export class SmokeScreen {
@@ -12,7 +9,7 @@ export class SmokeScreen {
         return JSON.stringify(this.toObject(object));
     }
 
-    fromJSON<T>(json: string, instanceClass: Constructable<T>) {
+    fromJSON<T>(json: string, instanceClass: Constructable<T>): T {
         return this.fromObject(JSON.parse(json), instanceClass);
     }
 
@@ -27,11 +24,7 @@ export class SmokeScreen {
                 }
                 let value = object[key];
                 if (exposureSettings.type) {
-                    if (isConstructable(exposureSettings.type)) {
-                        value = this.toObject(value);
-                    } else {
-                        value = exposureSettings.type.translateOutput(this, value);
-                    }
+                    value = exposureSettings.type.translateOutput(this, value);
                 }
                 const externalName = this.translate(key, exposureSettings);
                 exposure[externalName] = value;
@@ -70,11 +63,7 @@ export class SmokeScreen {
                 }
                 if (exposureSettings.type) {
                     try {
-                        if (isConstructable(exposureSettings.type)) {
-                            value = this.fromObject(value, exposureSettings.type);
-                        } else {
-                            value = exposureSettings.type.translateInput(this, value);
-                        }
+                        value = exposureSettings.type.translateInput(this, value);
                     } catch (e) {
                         errors.push(`property '${externalName}' ${e.message}`);
                         continue;

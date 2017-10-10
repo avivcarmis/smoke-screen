@@ -1,4 +1,4 @@
-import {Constructable, isConstructable, PropertyType} from "./interfaces";
+import {Constructable, PropertyType} from "./interfaces";
 import {SmokeScreen} from "./SmokeScreen";
 
 class StringType implements PropertyType {
@@ -85,7 +85,7 @@ class EnumType<T> implements PropertyType {
 
 class ArrayType implements PropertyType {
 
-    constructor(private readonly _itemType: PropertyType | Constructable<any>) {}
+    constructor(private readonly _itemType: PropertyType) {}
 
     translateOutput(_smokeScreen: SmokeScreen, value: any): any {
         return value;
@@ -97,23 +97,27 @@ class ArrayType implements PropertyType {
         }
         const result = [];
         for (const item of value) {
-            let translated;
-            if (isConstructable(this._itemType)) {
-                try {
-                    translated = _smokeScreen.fromObject(item, this._itemType);
-                } catch (e) {
-                    throw new Error("array parsing error: " + e.message);
-                }
-            } else {
-                try {
-                    translated = this._itemType.translateInput(_smokeScreen, item);
-                } catch (e) {
-                    throw new Error("all items of the array " + e.message);
-                }
+            try {
+                result.push(this._itemType.translateInput(_smokeScreen, item));
+            } catch (e) {
+                throw new Error("all items of the array " + e.message);
             }
-            result.push(translated);
         }
         return result;
+    }
+
+}
+
+class ObjectType<T> implements PropertyType {
+
+    constructor(private readonly _objectClass: Constructable<T>) {}
+
+    translateOutput(smokeScreen: SmokeScreen, value: any): any {
+        return smokeScreen.toObject(value);
+    }
+
+    translateInput(smokeScreen: SmokeScreen, value: any): any {
+        return smokeScreen.fromObject(value, this._objectClass);
     }
 
 }
@@ -126,10 +130,13 @@ export namespace PropertyTypes {
 
     export const boolean = new BooleanType();   // tslint:disable-line
 
+    export const objectOf = <T>(objectClass: Constructable<T>) =>
+        new ObjectType(objectClass);
+
     export const enumOf = <T>(enumClass: T, caseSensitive = false) =>
         new EnumType(enumClass, caseSensitive);
 
-    export const arrayOf = (itemType: PropertyType | Constructable<any>) =>
+    export const arrayOf = (itemType: PropertyType) =>
         new ArrayType(itemType);
 
 }

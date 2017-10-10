@@ -126,6 +126,39 @@ describe("Test property types", () => {
 
     });
 
+    describe("Test object property type", () => {
+
+        class NestedClass {
+
+            @exposed({type: PropertyTypes.string})
+            nestedProperty: string;
+
+        }
+
+        class Test {
+
+            @exposed({type: PropertyTypes.objectOf(NestedClass)})
+            property: NestedClass;
+
+        }
+
+        it("Test object property type success", () => {
+
+            const exposure = {property: {nestedProperty: "value"}};
+            const test = smokeScreen.fromObject(exposure, Test);
+            expect(test.property.nestedProperty).to.equal("value");
+
+        });
+
+        it("Test object property type failure", () => {
+
+            const exposure = {property: {nestedProperty: false}};
+            expect(() => smokeScreen.fromObject(exposure, Test)).to.throw(Error);
+
+        });
+
+    });
+
     describe("Test array property type", () => {
 
         describe("Test primitive array property type", () => {
@@ -188,35 +221,39 @@ describe("Test property types", () => {
 
         });
 
-        describe("Test class array property type", () => {
+        describe("Test object array property type", () => {
 
             class NestedClass {
 
-                @exposed
-                property: string;
+                @exposed({type: PropertyTypes.string})
+                nestedProperty: string;
 
             }
 
             class Test {
 
-                @exposed({type: PropertyTypes.arrayOf(NestedClass)})
+                @exposed({
+                    type: PropertyTypes.arrayOf(PropertyTypes.objectOf(NestedClass))
+                })
                 property: NestedClass[];
 
             }
 
-            it("Test primitive array property type success", () => {
+            it("Test object array property type success", () => {
 
-                const array = [{property: "value1"}, {property: "value2"}];
-                const test = smokeScreen.fromObject({property: array}, Test);
+                const exposure = {
+                    property: [{nestedProperty: "value1"}, {nestedProperty: "value2"}]
+                };
+                const test = smokeScreen.fromObject(exposure, Test);
                 expect(test.property.length).to.equal(2);
                 expect(test.property[0] instanceof NestedClass).to.equal(true);
-                expect(test.property[0].property).to.equal("value1");
+                expect(test.property[0].nestedProperty).to.equal("value1");
                 expect(test.property[1] instanceof NestedClass).to.equal(true);
-                expect(test.property[1].property).to.equal("value2");
+                expect(test.property[1].nestedProperty).to.equal("value2");
 
             });
 
-            it("Test primitive array property type failure", () => {
+            it("Test object array property type failure", () => {
 
                 expect(() => smokeScreen.fromObject({property: true}, Test))
                     .to.throw(Error);

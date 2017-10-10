@@ -15,7 +15,7 @@ export interface ExposureSettings {
 
     as?: string;
 
-    type?: PropertyType | Constructable<any>;
+    type?: PropertyType;
 
     validator?: (value: any) => any;
 
@@ -29,11 +29,6 @@ export interface Constructable<T> {
 
     new(): T;
 
-}
-
-export function isConstructable(object: any): object is Constructable<any> {
-    return typeof object === "function"
-        && /^class\s/.test(Function.prototype.toString.call(object));
 }
 
 export function exposed(target: any, propertyKey: string): void;
