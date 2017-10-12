@@ -87,18 +87,25 @@ class ArrayType implements PropertyType {
 
     constructor(private readonly _itemType: PropertyType) {}
 
-    translateOutput(_smokeScreen: SmokeScreen, value: any): any {
-        return value;
+    translateOutput(smokeScreen: SmokeScreen, value: any): any {
+        if (!(value instanceof Array)) {
+            return value;
+        }
+        const result = [];
+        for (const item of value) {
+            result.push(this._itemType.translateOutput(smokeScreen, item));
+        }
+        return result;
     }
 
-    translateInput(_smokeScreen: SmokeScreen, value: any): any {
+    translateInput(smokeScreen: SmokeScreen, value: any): any {
         if (!(value instanceof Array)) {
             throw new Error("must be an array");
         }
         const result = [];
         for (const item of value) {
             try {
-                result.push(this._itemType.translateInput(_smokeScreen, item));
+                result.push(this._itemType.translateInput(smokeScreen, item));
             } catch (e) {
                 throw new Error("all items of the array " + e.message);
             }

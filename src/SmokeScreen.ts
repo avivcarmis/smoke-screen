@@ -1,5 +1,6 @@
 import {Constructable, ExposureSettings, NamingTranslator} from "./interfaces";
 import {ReflectionMetadata} from "./ReflectionMetadata";
+import * as yamlJS from "yamljs";
 
 export class SmokeScreen {
 
@@ -11,6 +12,14 @@ export class SmokeScreen {
 
     fromJSON<T>(json: string, instanceClass: Constructable<T>): T {
         return this.fromObject(JSON.parse(json), instanceClass);
+    }
+
+    toYAML(object: any) {
+        return yamlJS.stringify(this.toObject(object));
+    }
+
+    fromYAML<T>(yaml: string, instanceClass: Constructable<T>): T {
+        return this.fromObject(yamlJS.parse(yaml), instanceClass);
     }
 
     toObject(object: any): {[key: string]: any} {
