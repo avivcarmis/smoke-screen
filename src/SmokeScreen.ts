@@ -4,11 +4,6 @@ import * as yamlJS from "yamljs";
 import {ExposureSettings} from "./Exposed";
 import {NamingTranslator} from "./NamingTranslator";
 
-/**
- * Translates property names,
- * receives a property name and returns a translated value.
- */
-
 export class SmokeScreen {
 
     constructor(private readonly namingTranslator: NamingTranslator | null = null) {}
