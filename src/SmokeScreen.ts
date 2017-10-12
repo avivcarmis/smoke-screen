@@ -33,7 +33,10 @@ export class SmokeScreen {
                 }
                 let value = object[key];
                 if (exposureSettings.type) {
-                    value = exposureSettings.type.translateOutput(this, value);
+                    const translated = exposureSettings.type.translateOutput(this, value);
+                    if (typeof translated !== "undefined") {
+                        value = translated;
+                    }
                 }
                 const externalName = this.translate(key, exposureSettings);
                 exposure[externalName] = value;
@@ -72,7 +75,11 @@ export class SmokeScreen {
                 }
                 if (exposureSettings.type) {
                     try {
-                        value = exposureSettings.type.translateInput(this, value);
+                        const translated =
+                            exposureSettings.type.translateInput(this, value);
+                        if (typeof translated !== "undefined") {
+                            value = translated;
+                        }
                     } catch (e) {
                         errors.push(`property '${externalName}' ${e.message}`);
                         continue;
@@ -80,7 +87,10 @@ export class SmokeScreen {
                 }
                 if (exposureSettings.validator) {
                     try {
-                        value = exposureSettings.validator(value);
+                        const translated = exposureSettings.validator(value);
+                        if (typeof translated !== "undefined") {
+                            value = translated;
+                        }
                     } catch (e) {
                         errors.push(`property '${externalName}' ${e.message}`);
                         continue;
