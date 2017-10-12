@@ -1,5 +1,8 @@
 import {ExposureSettings} from "./Exposed";
 
+/**
+ * Holds exposure information regarding class properties.
+ */
 export class ReflectionMetadata {
 
     private static readonly STORAGE_KEY = "__reflection_metadata";
