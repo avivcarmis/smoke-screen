@@ -147,7 +147,8 @@ class ArrayType implements PropertyType {
         const result = [];
         for (const item of value) {
             try {
-                result.push(this._itemType.deserialize(smokeScreen, item));
+                const translated = this._itemType.deserialize(smokeScreen, item);
+                result.push(typeof translated !== "undefined" ? translated : item);
             } catch (e) {
                 throw new Error("all items of the array " + e.message);
             }
