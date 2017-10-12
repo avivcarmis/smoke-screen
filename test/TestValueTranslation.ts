@@ -1,7 +1,8 @@
 import "mocha";
 import {expect} from "chai";
-import {exposed, PropertyType} from "../src/interfaces";
+import {exposed} from "../src/Exposed";
 import {SmokeScreen} from "../src/SmokeScreen";
+import {PropertyType} from "../src/PropertyType";
 
 describe("Test value translation", () => {
 
@@ -15,11 +16,11 @@ describe("Test value translation", () => {
 
             class TranslatingPropertyType implements PropertyType {
 
-                translateOutput(_smokeScreen: SmokeScreen, _value: any): any {
+                serialize(_smokeScreen: SmokeScreen, _value: any): any {
                     return TRANSLATED_OUTPUT;
                 }
 
-                translateInput(_smokeScreen: SmokeScreen, _value: any): any {
+                deserialize(_smokeScreen: SmokeScreen, _value: any): any {
                     return TRANSLATED_INPUT;
                 }
 
@@ -45,11 +46,11 @@ describe("Test value translation", () => {
 
             class TransparentPropertyType implements PropertyType {
 
-                translateOutput(_smokeScreen: SmokeScreen, _value: any): any {
+                serialize(_smokeScreen: SmokeScreen, _value: any): any {
                     return;
                 }
 
-                translateInput(_smokeScreen: SmokeScreen, _value: any): any {
+                deserialize(_smokeScreen: SmokeScreen, _value: any): any {
                     return;
                 }
 

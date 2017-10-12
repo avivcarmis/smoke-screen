@@ -1,7 +1,7 @@
 import "mocha";
 import {expect} from "chai";
-import {exposed} from "../src/interfaces";
-import {PropertyTypes} from "../src/PropertyTypes";
+import {exposed} from "../src/Exposed";
+import {PropertyTypes} from "../src/PropertyType";
 import {SmokeScreen} from "../src/SmokeScreen";
 
 describe("Test property types", () => {

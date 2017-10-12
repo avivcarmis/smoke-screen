@@ -1,4 +1,4 @@
-import {ExposureSettings} from "./interfaces";
+import {ExposureSettings} from "./Exposed";
 
 export class ReflectionMetadata {
 

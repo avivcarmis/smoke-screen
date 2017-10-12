@@ -1,8 +1,8 @@
 import "mocha";
 import {expect} from "chai";
-import {exposed} from "../src/interfaces";
+import {exposed} from "../src/Exposed";
 import {SmokeScreen} from "../src/SmokeScreen";
-import {PropertyTypes} from "../src/PropertyTypes";
+import {PropertyTypes} from "../src/PropertyType";
 import * as yamlJS from "yamljs";
 
 describe("Test conversion types", () => {

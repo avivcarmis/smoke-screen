@@ -1,5 +1,7 @@
 import * as to from "to-case";
 
+export type NamingTranslator = (propertyName: string) => string;
+
 export namespace NamingTranslators {
 
     type ToCase = (input: string) => string;

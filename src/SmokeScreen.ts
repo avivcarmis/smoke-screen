@@ -1,6 +1,13 @@
-import {Constructable, ExposureSettings, NamingTranslator} from "./interfaces";
+import {Constructable} from "./Constructable";
 import {ReflectionMetadata} from "./ReflectionMetadata";
 import * as yamlJS from "yamljs";
+import {ExposureSettings} from "./Exposed";
+import {NamingTranslator} from "./NamingTranslator";
+
+/**
+ * Translates property names,
+ * receives a property name and returns a translated value.
+ */
 
 export class SmokeScreen {
 
@@ -33,7 +40,7 @@ export class SmokeScreen {
                 }
                 let value = object[key];
                 if (exposureSettings.type) {
-                    const translated = exposureSettings.type.translateOutput(this, value);
+                    const translated = exposureSettings.type.serialize(this, value);
                     if (typeof translated !== "undefined") {
                         value = translated;
                     }
@@ -76,7 +83,7 @@ export class SmokeScreen {
                 if (exposureSettings.type) {
                     try {
                         const translated =
-                            exposureSettings.type.translateInput(this, value);
+                            exposureSettings.type.deserialize(this, value);
                         if (typeof translated !== "undefined") {
                             value = translated;
                         }

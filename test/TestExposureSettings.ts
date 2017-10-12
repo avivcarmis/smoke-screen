@@ -1,7 +1,8 @@
 import "mocha";
 import {expect} from "chai";
-import {exposed, PropertyType} from "../src/interfaces";
+import {exposed} from "../src/Exposed";
 import {SmokeScreen} from "../src/SmokeScreen";
+import {PropertyType} from "../src/PropertyType";
 
 describe("Test exposure settings", () => {
 
@@ -31,12 +32,12 @@ describe("Test exposure settings", () => {
 
             visitedInput = false;
 
-            translateOutput(_smokeScreen: SmokeScreen, value: any): any {
+            serialize(_smokeScreen: SmokeScreen, value: any): any {
                 this.visitedOutput = true;
                 return value;
             }
 
-            translateInput(_smokeScreen: SmokeScreen, value: any): any {
+            deserialize(_smokeScreen: SmokeScreen, value: any): any {
                 this.visitedInput = true;
                 return value;
             }
