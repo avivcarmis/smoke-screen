@@ -1,7 +1,7 @@
 {
   "name": "smoke-screen",
   "version": "1.0.0",
-  "description": "TODO",
+  "description": "Strong typing validation for JavaScript runtime",
   "engines": {
     "node": ">=6.11.2"
   },
@@ -23,7 +23,16 @@
     "url": "git+https://github.com/avivcarmis/smoke-screen.git"
   },
   "keywords": [
-    "TODO"
+    "javascript",
+    "runtime",
+    "runtime-validation",
+    "strongly-typed",
+    "strong-typing",
+    "schema",
+    "schema-validation",
+    "runtime-schema-validation",
+    "typescript",
+    "instantiation"
   ],
   "author": "Aviv Carmi",
   "license": "MIT",
