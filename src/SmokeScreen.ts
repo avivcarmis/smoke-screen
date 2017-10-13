@@ -113,7 +113,7 @@ export class SmokeScreen {
                     if (exposureSettings.defaultValue) {
                         value = exposureSettings.defaultValue;
                     } else {
-                        errors.push(`property '${externalName}' is missing missing`);
+                        errors.push(`property '${externalName}' is required`);
                         continue;
                     }
                 }
@@ -151,7 +151,7 @@ export class SmokeScreen {
                 (instance as any)[key] = value;
             }
             if (errors.length > 0) {
-                throw new Error(`illegal json - ${errors.join("; ")}`);
+                throw new Error(`illegal input - ${errors.join("; ")}`);
             }
         }
         return instance;
