@@ -249,21 +249,35 @@ To use Smoke Screen features, e.g. serialization and deserialization, an instanc
 `SmokeScreen` class must be first created. Once an instance is available, it provides 
 the following methods:
 
-- `toJSON(object: any): string` - takes any object and returns a JSON string of the 
-exposed object.
-- `fromJSON<T>(json: string, instanceClass: Constructable<T>): T` - takes a JSON string
-and a class to deserialize into and returns a validated instance of the class, or 
-throws an Error in case of invalid input.
-- `toYAML(object: any): string` - takes any object and returns a YAML string of the 
-exposed object.
-- `fromYAML<T>(yaml: string, instanceClass: Constructable<T>): T` - takes a YAML string
-and a class to deserialize into and returns a validated instance of the class, or 
-throws an Error in case of invalid input.
-- `toObject(object: any): {[key: string]: any}` - takes any object and returns a 
-generic JS object containing the exposed representation of the given object. This means
-that properties may be filtered, property names may be altered, and property values may be translated.
+- `toJSON(object: any): string` - Serializes the given object to a JSON string.
+Filtering properties and translating property names and their values if needed.
+- `fromJSON<T>(json: string, instanceClass: Constructable<T>): T` - Deserializes the given
+JSON string into a fresh instance of the given class and returns it. 
+Filtering properties, validates and translates the property names and their values if
+needed. throws an Error in case of invalid input.
+- `updateFromJSON<T>(json: string, instance: T): void` - Deserializes the given JSON
+string into the given instance. Filtering properties, validates and translates the 
+property names and their values if needed. throws an Error in case of invalid input.
+- `toYAML(object: any): string` - Serializes the given object to a YAML string. 
+Filtering properties and translating property names and their values if needed.
+- `fromYAML<T>(yaml: string, instanceClass: Constructable<T>): T` - Deserializes the
+given YAML string into a fresh instance of the given class and returns it.
+Filtering properties, validates and translates the property names and their values if
+needed. throws an Error in case of invalid input.
+- `updateFromYAML<T>(yaml: string, instance: T): void` - Deserializes the given YAML
+string into the given instance. Filtering properties, validates and translates the 
+property names and their values if needed. throws an Error in case of invalid input.
+- `toObject(object: any): {[key: string]: any}` - Serializes the given object to a generic
+JS object containing the exposure. Filtering properties and translating property names
+and their values if needed.
 - `fromObject<T>(exposure: {[key: string]: any}, instanceClass: Constructable<T>)` - 
-takes a generic JS object and a class to deserialize into and returns a validated instance of the class, or throws an Error in case of invalid input.
+Deserializes the given generic JS object into a fresh instance of the given class
+and returns it. Filtering properties, validates and translates the property names
+and their values if needed. throws an Error in case of invalid input.
+- `updateFromObject<T>(exposure: {[key: string]: any}, instance: T): void` - Deserializes
+the given generic JS object into the given instance. Filtering properties, validates 
+and translates the property names and their values if needed. throws an Error in case 
+of invalid input.
 
 ## Useful Links
 - [The project GitHub page](https://github.com/avivcarmis/smoke-screen "The project GitHub page")

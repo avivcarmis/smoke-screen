@@ -90,6 +90,9 @@ describe("Test conversion types", () => {
         testResult(serializedObject, "ENUM_VALUE");
         const deserialized = smokeScreen.fromJSON(serialized, Test);
         testResult(deserialized, test.enumProperty);
+        const instance = new Test();
+        smokeScreen.updateFromJSON(serialized, instance);
+        testResult(instance, test.enumProperty);
 
     });
 
@@ -100,6 +103,9 @@ describe("Test conversion types", () => {
         testResult(serializedObject, "ENUM_VALUE");
         const deserialized = smokeScreen.fromYAML(serialized, Test);
         testResult(deserialized, test.enumProperty);
+        const instance = new Test();
+        smokeScreen.updateFromYAML(serialized, instance);
+        testResult(instance, test.enumProperty);
 
     });
 
@@ -109,6 +115,9 @@ describe("Test conversion types", () => {
         testResult(serialized, "ENUM_VALUE");
         const deserialized = smokeScreen.fromObject(serialized, Test);
         testResult(deserialized, test.enumProperty);
+        const instance = new Test();
+        smokeScreen.updateFromObject(serialized, instance);
+        testResult(instance, test.enumProperty);
 
     });
 

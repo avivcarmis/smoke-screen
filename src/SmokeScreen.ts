@@ -21,7 +21,7 @@ export class SmokeScreen {
 
     /**
      * Serializes the given object to a JSON string.
-     * Translates the property names and their values if needed.
+     * Filtering properties and translating property names and their values if needed.
      * @param object        object to serialize
      * @returns {string}    the resulted JSON
      */
@@ -30,8 +30,9 @@ export class SmokeScreen {
     }
 
     /**
-     * Deserializes the given JSON string into an instance of the given class.
-     * Validates and translates the property names and their values if needed.
+     * Deserializes the given JSON string into a fresh instance of the given class and
+     * returns it. Filtering properties, validates and translates the property names and
+     * their values if needed. throws an Error in case of invalid input.
      * @param {string} json                     string to deserialize
      * @param {Constructable<T>} instanceClass  class to deserialize into
      * @returns {T}                             the resulted instance
@@ -41,8 +42,20 @@ export class SmokeScreen {
     }
 
     /**
+     * Deserializes the given JSON string into the given instance. Filtering properties,
+     * validates and translates the property names and their values if needed.
+     * throws an Error in case of invalid input.
+     * @param {string} json                     string to deserialize
+     * @param {Constructable<T>} instanceClass  class to deserialize into
+     * @returns {T}                             the resulted instance
+     */
+    updateFromJSON<T>(json: string, instance: T) {
+        this.updateFromObject(JSON.parse(json), instance);
+    }
+
+    /**
      * Serializes the given object to a YAML string.
-     * Translates the property names and their values if needed.
+     * Filtering properties and translating property names and their values if needed.
      * @param object        object to serialize
      * @returns {string}    the resulted YAML
      */
@@ -51,8 +64,9 @@ export class SmokeScreen {
     }
 
     /**
-     * Deserializes the given YAML string into an instance of the given class.
-     * Validates and translates the property names and their values if needed.
+     * Deserializes the given YAML string into a fresh instance of the given class and
+     * returns it. Filtering properties, validates and translates the property names and
+     * their values if needed. throws an Error in case of invalid input.
      * @param {string} yaml                     YAML to deserialize
      * @param {Constructable<T>} instanceClass  class to deserialize into
      * @returns {T}                             the resulted instance
@@ -62,8 +76,20 @@ export class SmokeScreen {
     }
 
     /**
-     * Serializes the given object to a generic JS object.
-     * Translates the property names and their values if needed.
+     * Deserializes the given YAML string into the given instance. Filtering properties,
+     * validates and translates the property names and their values if needed.
+     * throws an Error in case of invalid input.
+     * @param {string} yaml                     YAML to deserialize
+     * @param {Constructable<T>} instanceClass  class to deserialize into
+     * @returns {T}                             the resulted instance
+     */
+    updateFromYAML<T>(yaml: string, instance: T) {
+        this.updateFromObject(yamlJS.parse(yaml), instance);
+    }
+
+    /**
+     * Serializes the given object to a generic JS object containing the exposure.
+     * Filtering properties and translating property names and their values if needed.
      * @param object                    object to serialize
      * @returns {{[p: string]: any}}    the resulted generic object
      */
@@ -91,15 +117,28 @@ export class SmokeScreen {
     }
 
     /**
-     * Deserializes the given generic JS object into an instance of the given class.
-     * Validates and translates the property names and their values if needed.
+     * Deserializes the given generic JS object into a fresh instance of the given class
+     * and returns it. Filtering properties, validates and translates the property names
+     * and their values if needed. throws an Error in case of invalid input.
      * @param {{[p: string]: any}} exposure     object to deserialize
      * @param {Constructable<T>} instanceClass  class to deserialize into
      * @returns {T}                             the resulted instance
      */
     fromObject<T>(exposure: {[key: string]: any}, instanceClass: Constructable<T>) {
-        const errors = [];
         const instance = new instanceClass();
+        this.updateFromObject(exposure, instance);
+        return instance;
+    }
+
+    /**
+     * Deserializes the given generic JS object into the given instance.
+     * Filtering properties, validates and translates the property names and their values
+     * if needed. throws an Error in case of invalid input.
+     * @param {{[p: string]: any}} exposure
+     * @param {T} instance
+     */
+    updateFromObject<T>(exposure: {[key: string]: any}, instance: T) {
+        const errors = [];
         const reflectionMetadata = ReflectionMetadata.extract(instance);
         if (reflectionMetadata) {
             for (const key of reflectionMetadata.getPropertyKeys()) {
@@ -154,7 +193,6 @@ export class SmokeScreen {
                 throw new Error(`illegal input - ${errors.join("; ")}`);
             }
         }
-        return instance;
     }
 
     private translate(key: string, exposureSettings: ExposureSettings) {
