@@ -225,18 +225,45 @@ console.log(smokeScreen.fromJSON(json, Person)); // -> Person { firstName: 'John
 
 To enable custom naming translators, any implementation of a `NamingTranslator` type may be passed when instantiating a new `SmokeScreen` object.
 
-## Exposure Settings Reference
+## Exposing Properties
 
-When exposing properties, any subset of `ExposureSettings` object may be passed to override default behaviour:
+Exposing properties is done using the `@exposed` decorator, which accepts an optional 
+`ExposureSettings` object:
 
-- `as: string` - May be specified to override the exposed property key
-- `type: PropertyType` - A property type to perform typing validation and translation. (Further reading in [`PropertyType` the JSDocs](https://github.com/avivcarmis/smoke-screen/blob/master/src/PropertyType.ts#L8 "`PropertyType` the JSDocs"))
-- `validator: (value: any) => any` - A further validation function to perform a more specific validation and translation if needed. Note that a validation is performed only on deserialization and *not* on serialization.
+- `as?: string` - May be specified to override the exposed property key
+- `type?: PropertyType` - A property type to perform typing validation and translation.
+ (Further reading in [`PropertyType` the JSDocs](https://github.com/avivcarmis/smoke-screen/blob/master/src/PropertyType.ts#L8 "`PropertyType` the JSDocs"))
+- `validator?: (value: any) => any` - A further validation function to perform a more 
+specific validation and translation if needed. Note that a validation is performed only on deserialization and *not* on serialization.
 Validation may be performed by inspecting the input value parameter, if the value is invalid, the function should throw an error describing the invalidity.
 Translation may be performed by returning a value different than the given one. Skipping translation may be performed by simply not returning any value from the function, or by returning the given one.
-- `defaultValue: any` - May be used to declare the property as optional on deserialization process. Then, in case the property is missing, it receives the given defaullt value.
+- `defaultValue?: any` - May be used to declare the property as optional on 
+deserialization process. Then, in case the property is missing, it receives the given default value.
 By default, exposed properties are required on deserialization, unless a default value is specified.
-- `nullable: boolean` - May be used to allow the property a null value when deserializing. By default, exposed properties are may not receive null value on deserialization, unless this is set to true.
+- `nullable?: boolean` - May be used to allow the property a null value when 
+deserializing. By default, exposed properties are may not receive null value on deserialization, unless this is set to true.
+
+## The Smoke Screen Interface
+
+To use Smoke Screen features, e.g. serialization and deserialization, an instance of 
+`SmokeScreen` class must be first created. Once an instance is available, it provides 
+the following methods:
+
+- `toJSON(object: any): string` - takes any object and returns a JSON string of the 
+exposed object.
+- `fromJSON<T>(json: string, instanceClass: Constructable<T>): T` - takes a JSON string
+and a class to deserialize into and returns a validated instance of the class, or 
+throws an Error in case of invalid input.
+- `toYAML(object: any): string` - takes any object and returns a YAML string of the 
+exposed object.
+- `fromYAML<T>(yaml: string, instanceClass: Constructable<T>): T` - takes a YAML string
+and a class to deserialize into and returns a validated instance of the class, or 
+throws an Error in case of invalid input.
+- `toObject(object: any): {[key: string]: any}` - takes any object and returns a 
+generic JS object containing the exposed representation of the given object. This means
+that properties may be filtered, property names may be altered, and property values may be translated.
+- `fromObject<T>(exposure: {[key: string]: any}, instanceClass: Constructable<T>)` - 
+takes a generic JS object and a class to deserialize into and returns a validated instance of the class, or throws an Error in case of invalid input.
 
 ## Useful Links
 - [The project GitHub page](https://github.com/avivcarmis/smoke-screen "The project GitHub page")
