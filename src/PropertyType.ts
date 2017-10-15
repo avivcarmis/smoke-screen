@@ -181,24 +181,24 @@ export namespace PropertyTypes {
     /**
      * String property type
      */
-    export const string = new StringType();     // tslint:disable-line
+    export const string: PropertyType = new StringType();     // tslint:disable-line
 
     /**
      * Number property type
      */
-    export const number = new NumberType();     // tslint:disable-line
+    export const number: PropertyType = new NumberType();     // tslint:disable-line
 
     /**
      * Boolean property type
      */
-    export const boolean = new BooleanType();   // tslint:disable-line
+    export const boolean: PropertyType = new BooleanType();   // tslint:disable-line
 
     /**
      * Returns an object property type
      * @param {Constructable} objectClass    the object class
      */
-    export const objectOf = <T>(objectClass: Constructable<T>) =>
-        new ObjectType(objectClass);
+    export const objectOf: <T>(objectClass: Constructable<T>) => PropertyType =
+            objectClass => new ObjectType(objectClass);
 
     /**
      * Returns an enum property type of the given enum
@@ -206,15 +206,15 @@ export namespace PropertyTypes {
      * @param {boolean} caseSensitive       whether or not to enforce case sensitivity
      *                                      when deserializing
      */
-    export const enumOf = <T>(enumClass: T, caseSensitive = false) =>
-        new EnumType(enumClass, caseSensitive);
+    export const enumOf: <T>(enumClass: T, caseSensitive?: boolean) => PropertyType
+        = (enumClass, caseSensitive = false) => new EnumType(enumClass, caseSensitive);
 
     /**
      * Returns an array property type
      * @param {PropertyType} itemType       a property type to be used for the array
      *                                      items
      */
-    export const arrayOf = (itemType: PropertyType) =>
-        new ArrayType(itemType);
+    export const arrayOf: (itemType: PropertyType) => PropertyType
+        = (itemType: PropertyType) => new ArrayType(itemType);
 
 }

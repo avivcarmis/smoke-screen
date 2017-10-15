@@ -9,8 +9,9 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
-    "experimentalDecorators": true,
     "sourceMap": true,
+    "experimentalDecorators": true,
+    "declaration": true,
     "paths": {
       "*": [
         "node_modules/*",
