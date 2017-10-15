@@ -2,7 +2,7 @@
 
 [![SmokeScreen Build Status at Travis CI](https://api.travis-ci.org/avivcarmis/smoke-screen.svg?branch=master)]("https://api.travis-ci.org/avivcarmis/smoke-screen.svg?branch=master")
 
-Strong typing validation for JavaScript runtime.
+Strongly typed validation for JavaScript runtime.
 
 ## In a Nutshell
 

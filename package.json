@@ -1,7 +1,7 @@
 {
   "name": "smoke-screen",
-  "version": "1.0.1",
-  "description": "Strong typing validation for JavaScript runtime",
+  "version": "1.0.2",
+  "description": "Strongly typed validation for JavaScript runtime",
   "engines": {
     "node": ">=6.11.2"
   },
