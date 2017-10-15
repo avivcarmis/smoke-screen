@@ -11,7 +11,16 @@ Smoke Screen is designed to serialize and deserialize JavaScript objects, JSON o
 
 ## Getting Started
 
-The following sections explain the main features of Smoke Screen, each with a complete example.
+Installation via npm:
+
+`$ npm install smoke-screen --save`
+
+The following sections explain the main features of Smoke Screen.
+
+> Comparability Note: Smoke Screen library depends on EcmaScript decorators. While 
+EcmaScript doesn't officially support decorators yet, the examples below are 
+implemented in TypeScript, but may also be implemented in any other way that compiles 
+decorators.
 
 ### Basic Serialization and Deserialization
 
