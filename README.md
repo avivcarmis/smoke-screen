@@ -64,7 +64,7 @@ class Person {
 
     @exposed({
         as: "myAge",
-        type: PropertyTypes.number,
+        type: "number",
         validator: value => {
             if (value < 18) {
                 throw new Error("must be at least 18");
@@ -94,17 +94,17 @@ json = JSON.stringify({myAge: null});
 smokeScreen.fromJSON(json, Person); // Error: illegal input - property 'myAge' may not be null
 ```
 
-As can be seen in the example, `exposed` properties are by default required and non-nullable. A property can be optional, by passing a default value to be set when no value is specified in the source:
+As can be seen in the example, `exposed` properties are by default required and non-nullable. A property can be optional, by setting the optional flag to true, and optionally set the default property value in the constructor, like so:
 
 ```typescript
 class Person {
 
     @exposed({
         as: "myAge",
-        type: PropertyTypes.number,
-        defaultValue: 42.3
+        type: "number",
+        optional: true 
     })
-    age: number;
+    age = 42.3;
 
 }
 
@@ -120,10 +120,10 @@ class Person {
 
     @exposed({
         as: "myAge",
-        type: PropertyTypes.number,
+        type: "number",
         nullable: true
     })
-    age: number;
+    age: number | null;
 
 }
 
@@ -134,8 +134,16 @@ console.log(person); // -> Person { age: null }
 
 ### Property Types
 
-All property types are available under the namespace `PropertyTypes`. If set, input types are enforced.
-If any property contains illegal type, an `Error` will be thrown describing the unmet requirement.
+Setting the exposure type allows us to enforce strong typing and to translate input and ouput values.
+A property type must be an object implementing the `PropertyType` interface. This is very simple to implement in case you want to achieve any custom behavior you like; However, Smoke Screen provides out-of-the-box implementation for all major type:
+- string - using the pre-declared `StringType` object, or a shorter writing `"string"`.
+- number - using the pre-declared `NumberType` object, or a shorter writing `"number"`.
+- boolean - using the pre-declared `BooleanType` object, or a shorter writing `"boolean"`.
+- object - using the pre-declared `ObjectType` object, or simply writing the name of the class like so: `Foo`.
+- array - using the pre-declared `ArrayType` object, or simply placing the element type within an array like so: `[Foo]`.
+- enum - using the pre-declared `EnumType` object, or simply writing the name of the enum like so: `Foo`.
+- map - using the pre-declared `MapType` object.
+While deserialization, if any of the source properties contains illegal type, an `Error` will be thrown describing the unmet requirement.
 
 ```typescript
 enum Mood {
@@ -146,29 +154,29 @@ enum Mood {
 
 class Animal {
 
-    @exposed({type: PropertyTypes.string})
+    @exposed({type: "string"})
     name: string;
 
 }
 
 class Person {
 
-    @exposed({type: PropertyTypes.string})
+    @exposed({type: "string"})
     name: string;
 
-    @exposed({type: PropertyTypes.number})
+    @exposed({type: "number"})
     age: number;
 
-    @exposed({type: PropertyTypes.boolean})
+    @exposed({type: "boolean"})
     isFunny: boolean;
 
-    @exposed({type: PropertyTypes.enumOf(Mood)})
+    @exposed({type: Mood})
     mood: Mood;
 
-    @exposed({type: PropertyTypes.objectOf(Animal)})
+    @exposed({type: Animal})
     pet: Animal;
 
-    @exposed({type: PropertyTypes.arrayOf(PropertyTypes.string)})
+    @exposed({type: ["string"]})
     speaks: string[];
 
 }
@@ -237,9 +245,8 @@ Exposing properties is done using the `@exposed` decorator, which accepts an opt
 specific validation and translation if needed. Note that a validation is performed only on deserialization and *not* on serialization.
 Validation may be performed by inspecting the input value parameter, if the value is invalid, the function should throw an error describing the invalidity.
 Translation may be performed by returning a value different than the given one. Skipping translation may be performed by simply not returning any value from the function, or by returning the given one.
-- `defaultValue?: any` - May be used to declare the property as optional on 
-deserialization process. Then, in case the property is missing, it receives the given default value.
-By default, exposed properties are required on deserialization, unless a default value is specified.
+- `optional?: boolean` - May be used to allow the property to not appear in the source of the deserialization process.
+By default, exposed properties are required on deserialization, unless this is set to true.
 - `nullable?: boolean` - May be used to allow the property a null value when 
 deserializing. By default, exposed properties are may not receive null value on deserialization, unless this is set to true.
 

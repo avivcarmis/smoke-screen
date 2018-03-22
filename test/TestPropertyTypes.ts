@@ -1,8 +1,8 @@
 import "mocha";
 import {expect} from "chai";
-import {exposed} from "../src/Exposed";
-import {PropertyTypes} from "../src/PropertyType";
 import {SmokeScreen} from "../src/SmokeScreen";
+import {EnumType, MapType} from "../src/PropertyType";
+import {exposed} from "../src/exposed";
 
 describe("Test property types", () => {
 
@@ -12,7 +12,7 @@ describe("Test property types", () => {
 
         class Test {
 
-            @exposed({type: PropertyTypes.string})
+            @exposed({type: "string"})
             property: string;
 
         }
@@ -37,7 +37,7 @@ describe("Test property types", () => {
 
         class Test {
 
-            @exposed({type: PropertyTypes.number})
+            @exposed({type: "number"})
             property: number;
 
         }
@@ -62,7 +62,7 @@ describe("Test property types", () => {
 
         class Test {
 
-            @exposed({type: PropertyTypes.boolean})
+            @exposed({type: "boolean"})
             property: boolean;
 
         }
@@ -96,7 +96,7 @@ describe("Test property types", () => {
 
             class Test {
 
-                @exposed({type: PropertyTypes.enumOf(TestEnum)})
+                @exposed({type: TestEnum})
                 property: TestEnum;
 
             }
@@ -112,7 +112,7 @@ describe("Test property types", () => {
 
             class Test {
 
-                @exposed({type: PropertyTypes.enumOf(TestEnum, true)})
+                @exposed({type: EnumType(TestEnum, true)})
                 property: TestEnum;
 
             }
@@ -130,14 +130,14 @@ describe("Test property types", () => {
 
         class NestedClass {
 
-            @exposed({type: PropertyTypes.string})
+            @exposed({type: "string"})
             nestedProperty: string;
 
         }
 
         class Test {
 
-            @exposed({type: PropertyTypes.objectOf(NestedClass)})
+            @exposed({type: NestedClass})
             property: NestedClass;
 
         }
@@ -159,13 +159,43 @@ describe("Test property types", () => {
 
     });
 
+    describe("Test map property type", () => {
+
+        class Test {
+
+            @exposed({type: MapType("string")})
+            property: Map<string, string>;
+
+        }
+
+        it("Test map property type success", () => {
+
+            const exposure = {property: {key1: "value1", key2: "value2"}};
+            const test = smokeScreen.fromObject(exposure, Test);
+            expect(test.property.size).to.equal(2);
+            expect(test.property.has("key1")).to.equal(true);
+            expect(test.property.get("key1")).to.equal("value1");
+            expect(test.property.has("key2")).to.equal(true);
+            expect(test.property.get("key2")).to.equal("value2");
+
+        });
+
+        it("Test map property type failure", () => {
+
+            const exposure = {property: {key1: false, key2: "value2"}};
+            expect(() => smokeScreen.fromObject(exposure, Test)).to.throw(Error);
+
+        });
+
+    });
+
     describe("Test array property type", () => {
 
         describe("Test primitive array property type", () => {
 
             class Test {
 
-                @exposed({type: PropertyTypes.arrayOf(PropertyTypes.string)})
+                @exposed({type: ["string"]})
                 property: string[];
 
             }
@@ -198,7 +228,7 @@ describe("Test property types", () => {
 
             class Test {
 
-                @exposed({type: PropertyTypes.arrayOf(PropertyTypes.enumOf(TestEnum))})
+                @exposed({type: [TestEnum]})
                 property: TestEnum[];
 
             }
@@ -225,16 +255,14 @@ describe("Test property types", () => {
 
             class NestedClass {
 
-                @exposed({type: PropertyTypes.string})
+                @exposed({type: "string"})
                 nestedProperty: string;
 
             }
 
             class Test {
 
-                @exposed({
-                    type: PropertyTypes.arrayOf(PropertyTypes.objectOf(NestedClass))
-                })
+                @exposed({type: [NestedClass]})
                 property: NestedClass[];
 
             }

@@ -1,15 +1,14 @@
 import "mocha";
 import {expect} from "chai";
-import {exposed} from "../src/Exposed";
 import {SmokeScreen} from "../src/SmokeScreen";
-import {PropertyTypes} from "../src/PropertyType";
 import * as yamlJS from "yamljs";
+import {exposed} from "../src/exposed";
 
 describe("Test conversion types", () => {
 
     class Nested {
 
-        @exposed({type: PropertyTypes.string})
+        @exposed({type: "string"})
         nestedProperty: string;
 
         nestedUnexposedProperty: string;
@@ -24,22 +23,22 @@ describe("Test conversion types", () => {
 
     class Test {
 
-        @exposed({type: PropertyTypes.string})
+        @exposed({type: "string"})
         stringProperty: string;
 
-        @exposed({type: PropertyTypes.boolean})
+        @exposed({type: "boolean"})
         booleanProperty: boolean;
 
-        @exposed({type: PropertyTypes.number})
+        @exposed({type: "number"})
         numberProperty: number;
 
-        @exposed({type: PropertyTypes.objectOf(Nested)})
+        @exposed({type: Nested})
         objectProperty: Nested;
 
-        @exposed({type: PropertyTypes.arrayOf(PropertyTypes.objectOf(Nested))})
+        @exposed({type: [Nested]})
         arrayProperty: Nested[];
 
-        @exposed({type: PropertyTypes.enumOf(Enum)})
+        @exposed({type: Enum})
         enumProperty: Enum;
 
         unexposedProperty: string;

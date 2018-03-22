@@ -1,5 +1,4 @@
-import {ReflectionMetadata} from "./ReflectionMetadata";
-import {PropertyType} from "./PropertyType";
+import {PropertyType, ShortPropertyType} from "./PropertyType";
 
 /**
  * An object describing the serialize and deserialize requirements
@@ -15,7 +14,7 @@ export interface ExposureSettings {
     /**
      * A property type to perform typing validation and translation
      */
-    type?: PropertyType;
+    type?: PropertyType | ShortPropertyType;
 
     /**
      * A further validation function to perform a more specific validation
@@ -36,14 +35,13 @@ export interface ExposureSettings {
     validator?: (value: any) => any;
 
     /**
-     * May be used to declare the property as optional on deserialization
-     * process. Then, in case which the property is missing, it receives
-     * default value given.
+     * May be used to allow the property to not appear in the source of the
+     * deserialization process.
      *
      * By default, exposed properties are required on deserialization,
-     * unless a default value is specified.
+     * unless this is set to true.
      */
-    defaultValue?: any;
+    optional?: boolean;
 
     /**
      * May be used to allow the property a null value when deserializing.
@@ -53,32 +51,4 @@ export interface ExposureSettings {
      */
     nullable?: boolean;
 
-}
-
-/**
- * Decorates a property without any custom exposure settings.
- */
-export function exposed(target: any, propertyKey: string): void;
-
-/**
- * Decorates a property with given Exposure settings.
- */
-export function exposed(settings?: ExposureSettings): (target: any,
-                                                       propertyKey: string) => void;
-
-/**
- * Decoration implementation
- */
-export function exposed(a: any, b?: string): any {
-    function getDecorator(settings: ExposureSettings) {
-        return (target: any, propertyKey: string) => {
-            const reflectionMetadata = ReflectionMetadata.extract(target);
-            reflectionMetadata.addProperty(propertyKey, settings);
-        };
-    }
-    if (b) {
-        getDecorator({})(a, b);
-    } else {
-        return getDecorator(a || {});
-    }
 }

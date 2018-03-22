@@ -16,7 +16,8 @@
     "member-access": [true, "no-public"],
     "max-classes-per-file": false,
     "no-namespace": false,
-    "member-ordering": [true, {"order": "instance-sandwich"}]
+    "member-ordering": [true, {"order": "instance-sandwich"}],
+    "triple-equals": false
   },
   "jsRules": {},
   "rulesDirectory": []

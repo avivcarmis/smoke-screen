@@ -1,8 +1,9 @@
 import {Constructable} from "./Constructable";
-import {ReflectionMetadata} from "./ReflectionMetadata";
+import {ReflectionService} from "./ReflectionService";
 import * as yamlJS from "yamljs";
-import {ExposureSettings} from "./Exposed";
+import {ExposureSettings} from "./ExposureSettings";
 import {NamingTranslator} from "./NamingTranslator";
+import {parseShortPropertyType} from "./PropertyType";
 
 /**
  * The main module interface.
@@ -95,7 +96,7 @@ export class SmokeScreen {
      */
     toObject(object: any): {[key: string]: any} {
         const exposure: any = {};
-        const reflectionMetadata = ReflectionMetadata.extract(object);
+        const reflectionMetadata = ReflectionService.extract(object);
         if (reflectionMetadata) {
             for (const key of Object.keys(object)) {
                 const exposureSettings = reflectionMetadata.getProperty(key);
@@ -104,7 +105,8 @@ export class SmokeScreen {
                 }
                 let value = object[key];
                 if (exposureSettings.type) {
-                    const translated = exposureSettings.type.serialize(this, value);
+                    const type = parseShortPropertyType(exposureSettings.type);
+                    const translated = type.serialize(this, value);
                     if (typeof translated !== "undefined") {
                         value = translated;
                     }
@@ -139,7 +141,7 @@ export class SmokeScreen {
      */
     updateFromObject<T>(exposure: {[key: string]: any}, instance: T) {
         const errors = [];
-        const reflectionMetadata = ReflectionMetadata.extract(instance);
+        const reflectionMetadata = ReflectionService.extract(instance);
         if (reflectionMetadata) {
             for (const key of reflectionMetadata.getPropertyKeys()) {
                 const exposureSettings = reflectionMetadata.getProperty(key);
@@ -149,12 +151,10 @@ export class SmokeScreen {
                 const externalName = this.translate(key, exposureSettings);
                 let value = exposure[externalName];
                 if (typeof value === "undefined") {
-                    if (exposureSettings.defaultValue) {
-                        value = exposureSettings.defaultValue;
-                    } else {
+                    if (!exposureSettings.optional) {
                         errors.push(`property '${externalName}' is required`);
-                        continue;
                     }
+                    continue;
                 }
                 if (value === null) {
                     if (exposureSettings.nullable) {
@@ -165,9 +165,9 @@ export class SmokeScreen {
                     continue;
                 }
                 if (exposureSettings.type) {
+                    const type = parseShortPropertyType(exposureSettings.type);
                     try {
-                        const translated =
-                            exposureSettings.type.deserialize(this, value);
+                        const translated = type.deserialize(this, value);
                         if (typeof translated !== "undefined") {
                             value = translated;
                         }

@@ -1,8 +1,8 @@
 import "mocha";
 import {expect} from "chai";
 import {SmokeScreen} from "../src/SmokeScreen";
-import {exposed} from "../src/Exposed";
 import {NamingTranslator, NamingTranslators} from "../src/NamingTranslator";
+import {exposed} from "../src/exposed";
 
 describe("Test all naming translators", () => {
 

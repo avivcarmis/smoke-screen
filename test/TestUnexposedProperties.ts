@@ -1,7 +1,7 @@
 import "mocha";
 import {expect} from "chai";
-import {exposed} from "../src/Exposed";
 import {SmokeScreen} from "../src/SmokeScreen";
+import {exposed} from "../src/exposed";
 
 describe("Test unexposed properties", () => {
 

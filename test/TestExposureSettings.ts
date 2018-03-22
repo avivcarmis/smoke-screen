@@ -1,8 +1,8 @@
 import "mocha";
 import {expect} from "chai";
-import {exposed} from "../src/Exposed";
 import {SmokeScreen} from "../src/SmokeScreen";
 import {PropertyType} from "../src/PropertyType";
+import {exposed} from "../src/exposed";
 
 describe("Test exposure settings", () => {
 
@@ -140,8 +140,8 @@ describe("Test exposure settings", () => {
 
             class Test {
 
-                @exposed({defaultValue: "value1"})
-                property: string;
+                @exposed({optional: true})
+                property = "value1";
 
             }
 

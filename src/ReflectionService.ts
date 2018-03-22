@@ -1,9 +1,9 @@
-import {ExposureSettings} from "./Exposed";
+import {ExposureSettings} from "./ExposureSettings";
 
 /**
  * Holds exposure information regarding class properties.
  */
-export class ReflectionMetadata {
+export class ReflectionService {
 
     private static readonly STORAGE_KEY = "__reflection_metadata";
 
@@ -22,10 +22,10 @@ export class ReflectionMetadata {
     }
 
     static extract(target: any) {
-        if (!target[ReflectionMetadata.STORAGE_KEY]) {
-            target[ReflectionMetadata.STORAGE_KEY] = new ReflectionMetadata();
+        if (!target[ReflectionService.STORAGE_KEY]) {
+            target[ReflectionService.STORAGE_KEY] = new ReflectionService();
         }
-        return (target[ReflectionMetadata.STORAGE_KEY] as ReflectionMetadata);
+        return (target[ReflectionService.STORAGE_KEY] as ReflectionService);
     }
 
 }
