@@ -3,7 +3,7 @@ import {ReflectionService} from "./ReflectionService";
 import * as yamlJS from "yamljs";
 import {ExposureSettings} from "./ExposureSettings";
 import {NamingTranslator} from "./NamingTranslator";
-import {parseShortPropertyType} from "./PropertyType";
+import {parseShortPropertyType, safeDeserialize, safeSerialize} from "./PropertyType";
 
 /**
  * The main module interface.
@@ -106,10 +106,7 @@ export class SmokeScreen {
                 let value = object[key];
                 if (exposureSettings.type) {
                     const type = parseShortPropertyType(exposureSettings.type);
-                    const translated = type.serialize(this, value);
-                    if (typeof translated !== "undefined") {
-                        value = translated;
-                    }
+                    value = safeSerialize(type, this, value);
                 }
                 const externalName = this.translate(key, exposureSettings);
                 exposure[externalName] = value;
@@ -167,10 +164,7 @@ export class SmokeScreen {
                 if (exposureSettings.type) {
                     const type = parseShortPropertyType(exposureSettings.type);
                     try {
-                        const translated = type.deserialize(this, value);
-                        if (typeof translated !== "undefined") {
-                            value = translated;
-                        }
+                        value = safeDeserialize(type, this, value);
                     } catch (e) {
                         errors.push(`property '${externalName}' ${e.message}`);
                         continue;

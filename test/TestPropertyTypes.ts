@@ -1,8 +1,11 @@
 import "mocha";
 import {expect} from "chai";
 import {SmokeScreen} from "../src/SmokeScreen";
-import {EnumType, MapType} from "../src/PropertyType";
 import {exposed} from "../src/exposed";
+import {PropertyTypes} from "../src/PropertyType";
+import EnumPropertyType = PropertyTypes.EnumPropertyType;
+import MapPropertyType = PropertyTypes.MapPropertyType;
+import SetPropertyType = PropertyTypes.SetPropertyType;
 
 describe("Test property types", () => {
 
@@ -12,19 +15,28 @@ describe("Test property types", () => {
 
         class Test {
 
-            @exposed({type: "string"})
+            @exposed({type: String})
             property: string;
 
         }
 
-        it("Test string property type success", () => {
+        it("Test serialize", () => {
+
+            const test = new Test();
+            test.property = "value";
+            const result = smokeScreen.toObject(test);
+            expect(result.property).to.equal("value");
+
+        });
+
+        it("Test deserialize success", () => {
 
             const test = smokeScreen.fromObject({property: "value"}, Test);
             expect(test.property).to.equal("value");
 
         });
 
-        it("Test string property type failure", () => {
+        it("Test deserialize failure", () => {
 
             expect(() => smokeScreen.fromObject({property: true}, Test))
                 .to.throw(Error);
@@ -37,19 +49,28 @@ describe("Test property types", () => {
 
         class Test {
 
-            @exposed({type: "number"})
+            @exposed({type: Number})
             property: number;
 
         }
 
-        it("Test number property type success", () => {
+        it("Test serialize", () => {
+
+            const test = new Test();
+            test.property = 12;
+            const result = smokeScreen.toObject(test);
+            expect(result.property).to.equal(12);
+
+        });
+
+        it("Test deserialize success", () => {
 
             const test = smokeScreen.fromObject({property: 5}, Test);
             expect(test.property).to.equal(5);
 
         });
 
-        it("Test number property type failure", () => {
+        it("Test deserialize failure", () => {
 
             expect(() => smokeScreen.fromObject({property: true}, Test))
                 .to.throw(Error);
@@ -62,19 +83,28 @@ describe("Test property types", () => {
 
         class Test {
 
-            @exposed({type: "boolean"})
+            @exposed({type: Boolean})
             property: boolean;
 
         }
 
-        it("Test boolean property type success", () => {
+        it("Test serialize", () => {
+
+            const test = new Test();
+            test.property = true;
+            const result = smokeScreen.toObject(test);
+            expect(result.property).to.equal(true);
+
+        });
+
+        it("Test deserialize success", () => {
 
             const test = smokeScreen.fromObject({property: true}, Test);
             expect(test.property).to.equal(true);
 
         });
 
-        it("Test boolean property type failure", () => {
+        it("Test deserialize failure", () => {
 
             expect(() => smokeScreen.fromObject({property: "value"}, Test))
                 .to.throw(Error);
@@ -92,7 +122,7 @@ describe("Test property types", () => {
 
         }
 
-        it("Test enum property type success", () => {
+        describe("Test case-insensitive", () => {
 
             class Test {
 
@@ -101,26 +131,68 @@ describe("Test property types", () => {
 
             }
 
-            let test = smokeScreen.fromObject({property: "FIRST_VALUE"}, Test);
-            expect(test.property).to.equal(TestEnum.FIRST_VALUE);
-            test = smokeScreen.fromObject({property: "second_value"}, Test);
-            expect(test.property).to.equal(TestEnum.SECOND_VALUE);
+            it("Test serialize", () => {
+
+                const test = new Test();
+                test.property = TestEnum.FIRST_VALUE;
+                const result = smokeScreen.toObject(test);
+                expect(result.property).to.equal("FIRST_VALUE");
+
+            });
+
+            it("Test deserialize success", () => {
+
+                let test = smokeScreen.fromObject({property: "FIRST_VALUE"}, Test);
+                expect(test.property).to.equal(TestEnum.FIRST_VALUE);
+                test = smokeScreen.fromObject({property: "second_value"}, Test);
+                expect(test.property).to.equal(TestEnum.SECOND_VALUE);
+
+            });
+
+            it("Test deserialize failure", () => {
+
+                expect(() => smokeScreen.fromObject({property: true}, Test))
+                    .to.throw(Error);
+                expect(() => smokeScreen.fromObject({property: "foo"}, Test))
+                    .to.throw(Error);
+
+            });
 
         });
 
-        it("Test enum property type failure", () => {
+        describe("Test case-sensitive", () => {
 
             class Test {
 
-                @exposed({type: EnumType(TestEnum, true)})
+                @exposed({type: new EnumPropertyType(TestEnum, true)})
                 property: TestEnum;
 
             }
 
-            expect(() => smokeScreen.fromObject({property: true}, Test))
-                .to.throw(Error);
-            expect(() => smokeScreen.fromObject({property: "second_value"}, Test))
-                .to.throw(Error);
+            it("Test serialize", () => {
+
+                const test = new Test();
+                test.property = TestEnum.FIRST_VALUE;
+                const result = smokeScreen.toObject(test);
+                expect(result.property).to.equal("FIRST_VALUE");
+
+            });
+
+            it("Test deserialize success", () => {
+
+                const test = smokeScreen.fromObject({property: "FIRST_VALUE"}, Test);
+                expect(test.property).to.equal(TestEnum.FIRST_VALUE);
+
+            });
+
+            it("Test deserialize failure", () => {
+
+                expect(() => smokeScreen.fromObject({property: true}, Test))
+                    .to.throw(Error);
+                expect(() => smokeScreen.fromObject({property: "second_value"}, Test))
+                    .to.throw(Error);
+
+            });
 
         });
 
@@ -130,7 +202,7 @@ describe("Test property types", () => {
 
         class NestedClass {
 
-            @exposed({type: "string"})
+            @exposed({type: String})
             nestedProperty: string;
 
         }
@@ -142,7 +214,17 @@ describe("Test property types", () => {
 
         }
 
-        it("Test object property type success", () => {
+        it("Test serialize", () => {
+
+            const test = new Test();
+            test.property = new NestedClass();
+            test.property.nestedProperty = "value";
+            const result = smokeScreen.toObject(test);
+            expect(result.property.nestedProperty).to.equal("value");
+
+        });
+
+        it("Test deserialize success", () => {
 
             const exposure = {property: {nestedProperty: "value"}};
             const test = smokeScreen.fromObject(exposure, Test);
@@ -150,7 +232,7 @@ describe("Test property types", () => {
 
         });
 
-        it("Test object property type failure", () => {
+        it("Test deserialize failure", () => {
 
             const exposure = {property: {nestedProperty: false}};
             expect(() => smokeScreen.fromObject(exposure, Test)).to.throw(Error);
@@ -163,12 +245,22 @@ describe("Test property types", () => {
 
         class Test {
 
-            @exposed({type: MapType("string")})
+            @exposed({type: new MapPropertyType(String, String)})
             property: Map<string, string>;
 
         }
 
-        it("Test map property type success", () => {
+        it("Test serialize", () => {
+
+            const test = new Test();
+            test.property = new Map();
+            test.property.set("key", "value");
+            const result = smokeScreen.toObject(test);
+            expect(result.property.key).to.equal("value");
+
+        });
+
+        it("Test deserialize success", () => {
 
             const exposure = {property: {key1: "value1", key2: "value2"}};
             const test = smokeScreen.fromObject(exposure, Test);
@@ -180,9 +272,48 @@ describe("Test property types", () => {
 
         });
 
-        it("Test map property type failure", () => {
+        it("Test deserialize failure", () => {
 
             const exposure = {property: {key1: false, key2: "value2"}};
+            expect(() => smokeScreen.fromObject(exposure, Test)).to.throw(Error);
+
+        });
+
+    });
+
+    describe("Test set property type", () => {
+
+        class Test {
+
+            @exposed({type: new SetPropertyType(String)})
+            property: Set<string>;
+
+        }
+
+        it("Test serialize", () => {
+
+            const test = new Test();
+            test.property = new Set();
+            test.property.add("value1");
+            test.property.add("value2");
+            const result = smokeScreen.toObject(test);
+            expect(result.property).to.deep.equal(["value1", "value2"]);
+
+        });
+
+        it("Test deserialize success", () => {
+
+            const exposure = {property: ["value1", "value2", "value1"]};
+            const test = smokeScreen.fromObject(exposure, Test);
+            expect(test.property.size).to.equal(2);
+            expect(test.property.has("value1")).to.equal(true);
+            expect(test.property.has("value2")).to.equal(true);
+
+        });
+
+        it("Test deserialize failure", () => {
+
+            const exposure = {property: ["value1", true, "value1"]};
             expect(() => smokeScreen.fromObject(exposure, Test)).to.throw(Error);
 
         });
@@ -195,12 +326,21 @@ describe("Test property types", () => {
 
             class Test {
 
-                @exposed({type: ["string"]})
+                @exposed({type: [String]})
                 property: string[];
 
             }
 
-            it("Test primitive array property type success", () => {
+            it("Test serialize", () => {
+
+                const test = new Test();
+                test.property = ["value1", "value2"];
+                const result = smokeScreen.toObject(test);
+                expect(result.property).to.deep.equal(test.property);
+
+            });
+
+            it("Test deserialize success", () => {
 
                 const array = ["value1", "value2"];
                 const test = smokeScreen.fromObject({property: array}, Test);
@@ -208,7 +348,7 @@ describe("Test property types", () => {
 
             });
 
-            it("Test primitive array property type failure", () => {
+            it("Test deserialize failure", () => {
 
                 expect(() => smokeScreen.fromObject({property: true}, Test))
                     .to.throw(Error);
@@ -233,7 +373,16 @@ describe("Test property types", () => {
 
             }
 
-            it("Test enum array property type success", () => {
+            it("Test serialize", () => {
+
+                const test = new Test();
+                test.property = [TestEnum.FIRST_VALUE, TestEnum.FIRST_VALUE];
+                const result = smokeScreen.toObject(test);
+                expect(result.property).to.deep.equal(["FIRST_VALUE", "FIRST_VALUE"]);
+
+            });
+
+            it("Test deserialize success", () => {
 
                 const array = ["FIRST_VALUE", "SECOND_VALUE"];
                 const test = smokeScreen.fromObject({property: array}, Test);
@@ -242,7 +391,7 @@ describe("Test property types", () => {
 
             });
 
-            it("Test enum array property type failure", () => {
+            it("Test deserialize failure", () => {
 
                 expect(() => smokeScreen.fromObject({property: true}, Test))
                     .to.throw(Error);
@@ -255,7 +404,7 @@ describe("Test property types", () => {
 
             class NestedClass {
 
-                @exposed({type: "string"})
+                @exposed({type: String})
                 nestedProperty: string;
 
             }
@@ -267,7 +416,21 @@ describe("Test property types", () => {
 
             }
 
-            it("Test object array property type success", () => {
+            it("Test serialize", () => {
+
+                const test = new Test();
+                test.property = [new NestedClass(), new NestedClass()];
+                test.property[0].nestedProperty = "value1";
+                test.property[1].nestedProperty = "value2";
+                const result = smokeScreen.toObject(test);
+                expect(result.property).to.deep.equal([
+                    {nestedProperty: "value1"},
+                    {nestedProperty: "value2"}
+                ]);
+
+            });
+
+            it("Test deserialize success", () => {
 
                 const exposure = {
                     property: [{nestedProperty: "value1"}, {nestedProperty: "value2"}]
@@ -281,7 +444,7 @@ describe("Test property types", () => {
 
             });
 
-            it("Test object array property type failure", () => {
+            it("Test deserialize failure", () => {
 
                 expect(() => smokeScreen.fromObject({property: true}, Test))
                     .to.throw(Error);

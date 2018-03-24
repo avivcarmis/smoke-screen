@@ -7,7 +7,7 @@ Strongly typed validation for JavaScript runtime.
 ## In a Nutshell
 
 Smoke Screen is a lightweight JS library allowing seamless schema validation and class instantiation.
-Smoke Screen is designed to serialize and deserialize JavaScript objects, JSON or YAML string while enforcing validation, and performing property filtering and renaming.
+Smoke Screen is designed to serialize and deserialize JavaScript objects, JSON or YAML string while enforcing validation, and performing property filtering and modification.
 
 ## Getting Started
 
@@ -42,11 +42,14 @@ class Person {
 
 }
 
+// let's serialize a Person object into a JSON string
 const person = new Person();
 person.name = "john";
 person.transientProperty = "will not get exposed";
 const smokeScreen = new SmokeScreen();
-smokeScreen.toJSON(person); // -> {"name":"john"}
+smokeScreen.toJSON(person); // -> '{"name":"john"}'
+
+// let's deserialize a JSON string into a Person object
 const json = JSON.stringify({name: "steve", age: 57.3, transientProperty: "value"});
 const person2 = smokeScreen.fromJSON(json, Person);
 console.log(person2); // -> Person { name: 'steve' }
@@ -64,7 +67,7 @@ class Person {
 
     @exposed({
         as: "myAge",
-        type: "number",
+        type: Number,
         validator: value => {
             if (value < 18) {
                 throw new Error("must be at least 18");
@@ -75,33 +78,46 @@ class Person {
 
 }
 
+// let's serialize a Person object into a JSON string
 const person = new Person();
 person.age = 56.8;
 const smokeScreen = new SmokeScreen();
-smokeScreen.toJSON(person); // -> {"myAge":56.8}
+smokeScreen.toJSON(person); // -> '{"myAge":56.8}'
+
+// let's deserialize a JSON string into a Person object
 let json = JSON.stringify({myAge: 19});
 const person2 = smokeScreen.fromJSON(json, Person);
 console.log(person2); // -> Person { age: 19 }
-json = JSON.stringify({age: 27});
-smokeScreen.fromJSON(json, Person); // Error: illegal input - property 'myAge' is missing
+
+// let's see the typing validation in action
 json = JSON.stringify({myAge: "oops"});
 smokeScreen.fromJSON(json, Person); // Error: illegal input - property 'myAge' must be a number
+
+// let's see the custom validator in action
 json = JSON.stringify({myAge: 17});
 smokeScreen.fromJSON(json, Person); // Error: illegal input - property 'myAge' must be at least 18
+
+// let's see property naming in action
+json = JSON.stringify({age: 27});
+smokeScreen.fromJSON(json, Person); // Error: illegal input - property 'myAge' is required
+
+// unless otherwise specified, exposed properties are required
 json = JSON.stringify({});
 smokeScreen.fromJSON(json, Person); // Error: illegal input - property 'myAge' is required
+
+// unless otherwise specified, exposed properties may not be null
 json = JSON.stringify({myAge: null});
 smokeScreen.fromJSON(json, Person); // Error: illegal input - property 'myAge' may not be null
 ```
 
-As can be seen in the example, `exposed` properties are by default required and non-nullable. A property can be optional, by setting the optional flag to true, and optionally set the default property value in the constructor, like so:
+As can be seen in the example, `exposed` properties are by default required and non-nullable. A property can become optional by setting the optional flag to true, and optionally set the default property value in the constructor, like so:
 
 ```typescript
 class Person {
 
     @exposed({
         as: "myAge",
-        type: "number",
+        type: Number,
         optional: true 
     })
     age = 42.3;
@@ -120,7 +136,7 @@ class Person {
 
     @exposed({
         as: "myAge",
-        type: "number",
+        type: Number,
         nullable: true
     })
     age: number | null;
@@ -134,16 +150,54 @@ console.log(person); // -> Person { age: null }
 
 ### Property Types
 
-Setting the exposure type allows us to enforce strong typing and to translate input and ouput values.
-A property type must be an object implementing the `PropertyType` interface. This is very simple to implement in case you want to achieve any custom behavior you like; However, Smoke Screen provides out-of-the-box implementation for all major type:
-- string - using the pre-declared `StringType` object, or a shorter writing `"string"`.
-- number - using the pre-declared `NumberType` object, or a shorter writing `"number"`.
-- boolean - using the pre-declared `BooleanType` object, or a shorter writing `"boolean"`.
-- object - using the pre-declared `ObjectType` object, or simply writing the name of the class like so: `Foo`.
-- array - using the pre-declared `ArrayType` object, or simply placing the element type within an array like so: `[Foo]`.
-- enum - using the pre-declared `EnumType` object, or simply writing the name of the enum like so: `Foo`.
-- map - using the pre-declared `MapType` object.
-While deserialization, if any of the source properties contains illegal type, an `Error` will be thrown describing the unmet requirement.
+Setting the exposure type allows us to enforce strong typing and to translate input and output values.
+A property type must be an object implementing the `PropertyType` interface. This is very simple to implement in case you want to achieve any custom behavior you like; However, Smoke Screen provides out-of-the-box implementation for all major types under the `PropertyTypes` namespace:
+- `StringPropertyType`
+- `NumberPropertyType`
+- `BooleanPropertyType`
+- `ObjectPropertyType`
+- `ArrayPropertyType`
+- `EnumPropertyType`
+- `MapPropertyType`
+- `SetPropertyType`
+
+For example:
+
+```typescript
+class Pet {
+
+    @exposed({type: StringPropertyType})
+    name: string;
+    
+}
+
+class Person {
+
+    @exposed({type: NumberPropertyType})
+    age: number;
+    
+    @exposed({type: ArrayPropertyType(ObjectPropertyType(Pet))})
+    pets: Pet[];
+    
+    @exposed({type: SetPropertyType(StringPropertyType)})
+    favoriteFoods: Set<string>;
+    
+    @exposed({type: MapPropertyType(StringPropertyType, BooleanPropertyType)})
+    likesAndDislikes: Map<string, boolean>;
+
+}
+````
+
+Note that instead of referencing these `PropertyType` classes directly, its possible to use a short writing as follows:
+
+- Instead of referencing `StringPropertyType`, we can simply reference the native `String` class.
+- Instead of referencing `NumberPropertyType`, we can simply reference the native `Number` class.
+- Instead of referencing `BooleanPropertyType`, we can simply reference the native `Boolean` class.
+- Instead of referencing `ObjectPropertyType`, we can simply reference object class itself.
+- Instead of referencing `EnumPropertyType`, we can simply reference enum class itself.
+- Instead of referencing `ArrayPropertyType`, we can simply create an array containing exactly one property type, stating the array type.
+
+Let's see all of this in action:
 
 ```typescript
 enum Mood {
@@ -154,58 +208,55 @@ enum Mood {
 
 class Animal {
 
-    @exposed({type: "string"})
+    @exposed({type: String})
     name: string;
 
 }
 
 class Person {
 
-    @exposed({type: "string"})
+    @exposed({type: String}) // string short writing
     name: string;
 
-    @exposed({type: "number"})
+    @exposed({type: Number}) // number short writing
     age: number;
 
-    @exposed({type: "boolean"})
+    @exposed({type: Boolean}) // boolean short writing
     isFunny: boolean;
 
-    @exposed({type: Mood})
+    @exposed({type: Mood}) // enum short writing
     mood: Mood;
 
-    @exposed({type: Animal})
-    pet: Animal;
+    @exposed({type: Animal}) // object short writing
+    favoritePet: Animal;
 
-    @exposed({type: ["string"]})
+    @exposed({type: [Animal]}) // array and object short writing
+    pets: Animal[];
+
+    @exposed({type: [String]}) // array and string short writing
     speaks: string[];
+    
+    @exposed({type: SetPropertyType(String)}) // string short writing
+    favoriteFoods: Set<string>;
+    
+    @exposed({type: MapPropertyType(String, Boolean)}) // string and boolean short writing
+    likesAndDislikes: Map<string, boolean>;
 
 }
-
-const smokeScreen = new SmokeScreen();
-const json = JSON.stringify({
-    name: "jason",
-    age: 72,
-    isFunny: true,
-    mood: "happy",
-    pet: {name: "bobby"},
-    speaks: ["english", "spanish"]
-});
-const person = smokeScreen.fromJSON(json, Person);
-console.log(person); // ->
-// Person {
-//     name: 'jason',
-//         age: 72,
-//         isFunny: true,
-//         mood: Mood.HAPPY,
-//         pet: Animal { name: 'bobby' },
-//     speaks: [ 'english', 'spanish' ] }
 ```
 
 To enable custom property types, any implementation of the `PropertyType` interface may be passed to the `@exposed` `type` field.
 
 ### Naming Translators
 
-All naming translators are available under the namespace `NamingTranslators`. If set, serialized and deserialized property names are converted accordingly.
+Smoke screen allows for automatic translation of property names. For instance you may want to expose all property names using `camel_case`.
+To achieve any custom translation, an implementation of a `NamingTranslator` function must be created which receive an internal property name, and returns the external name to expose; However, Smoke Screen provides out-of-the-box implementation for all major naming conventions under the `NamingTranslators` namespace:
+- `upperCamelCase` - WhichLooksLikeThis
+- `lowerSnakeCase` - which_looks_like_this
+- `upperSnakeCase` - WHICH_LOOKS_LIKE_THIS
+- `lowerKebabCase` - which-looks-like-this
+- `upperKebabCase` - WHICH-LOOKS-LIKE-THIS
+Let's see that in action:
 
 ```typescript
 class Person {
@@ -218,15 +269,20 @@ class Person {
 
 }
 
+// let's see the result without any naming translation
 const person = new Person();
 person.firstName = "John";
 person.lastName = "Doe";
 let smokeScreen = new SmokeScreen();
-console.log(smokeScreen.toJSON(person)); // -> {"firstName":"John","lastName":"Doe"}
+console.log(smokeScreen.toJSON(person)); // -> '{"firstName":"John","lastName":"Doe"}'
+
+// let's see the result with lower snake case naming translation
 smokeScreen = new SmokeScreen(NamingTranslators.lowerSnakeCase);
-console.log(smokeScreen.toJSON(person)); // -> {"first_name":"John","last_name":"Doe"}
+console.log(smokeScreen.toJSON(person)); // -> '{"first_name":"John","last_name":"Doe"}'
+
+// let's see the result with upper kebab case naming translation
 smokeScreen = new SmokeScreen(NamingTranslators.upperKebabCase);
-console.log(smokeScreen.toJSON(person)); // -> {"FIRST-NAME":"John","LAST-NAME":"Doe"}
+console.log(smokeScreen.toJSON(person)); // -> '{"FIRST-NAME":"John","LAST-NAME":"Doe"}'
 const json = JSON.stringify({"FIRST-NAME": "John", "LAST-NAME": "Doe"});
 console.log(smokeScreen.fromJSON(json, Person)); // -> Person { firstName: 'John', lastName: 'Doe' }
 ```

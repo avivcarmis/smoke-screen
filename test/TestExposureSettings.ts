@@ -44,7 +44,7 @@ describe("Test exposure settings", () => {
 
         }
 
-        it("Test exposure property type output", () => {
+        it("Test serialize", () => {
 
             const testType = new TestType();
 
@@ -64,7 +64,7 @@ describe("Test exposure settings", () => {
 
         });
 
-        it("Test exposure property type input", () => {
+        it("Test deserialize", () => {
 
             const testType = new TestType();
 
@@ -86,7 +86,7 @@ describe("Test exposure settings", () => {
 
     describe("Test exposure validator", () => {
 
-        it("Test exposure validator translation", () => {
+        it("Test translation", () => {
 
             class Test {
 
@@ -101,7 +101,7 @@ describe("Test exposure settings", () => {
 
         });
 
-        it("Test exposure validator failure", () => {
+        it("Test failure", () => {
 
             class Test {
 
@@ -120,9 +120,9 @@ describe("Test exposure settings", () => {
 
     });
 
-    describe("Test default value", () => {
+    describe("Test optional property", () => {
 
-        it("Test required property", () => {
+        it("Test required", () => {
 
             class Test {
 
@@ -136,7 +136,7 @@ describe("Test exposure settings", () => {
 
         });
 
-        it("Test optional property", () => {
+        it("Test optional", () => {
 
             class Test {
 
@@ -155,7 +155,7 @@ describe("Test exposure settings", () => {
 
     describe("Test nullable", () => {
 
-        it("Test nullable success", () => {
+        it("Test failure", () => {
 
             class Test {
 
@@ -170,12 +170,12 @@ describe("Test exposure settings", () => {
 
         });
 
-        it("Test optional property", () => {
+        it("Test success", () => {
 
             class Test {
 
                 @exposed({nullable: true})
-                property: string;
+                property: string | null;
 
             }
 

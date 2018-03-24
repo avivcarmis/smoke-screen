@@ -57,7 +57,6 @@ export namespace NamingTranslators {
     /**
      * translates input parameter name into UPPER-KEBAB-CASE
      */
-    export const upperKebabCase = constructByToCase(s =>
-        to.slug(s).toUpperCase(), false);
+    export const upperKebabCase = constructByToCase(s => to.slug(s).toUpperCase(), false);
 
 }

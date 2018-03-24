@@ -8,7 +8,7 @@ describe("Test conversion types", () => {
 
     class Nested {
 
-        @exposed({type: "string"})
+        @exposed({type: String})
         nestedProperty: string;
 
         nestedUnexposedProperty: string;
@@ -23,13 +23,13 @@ describe("Test conversion types", () => {
 
     class Test {
 
-        @exposed({type: "string"})
+        @exposed({type: String})
         stringProperty: string;
 
-        @exposed({type: "boolean"})
+        @exposed({type: Boolean})
         booleanProperty: boolean;
 
-        @exposed({type: "number"})
+        @exposed({type: Number})
         numberProperty: number;
 
         @exposed({type: Nested})
