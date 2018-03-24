@@ -13,6 +13,11 @@ describe("Test conversion types", () => {
 
         nestedUnexposedProperty: string;
 
+        constructor(nestedProperty: string, nestedUnexposedProperty: string) {
+            this.nestedProperty = nestedProperty;
+            this.nestedUnexposedProperty = nestedUnexposedProperty;
+        }
+
     }
 
     enum Enum {
@@ -43,25 +48,32 @@ describe("Test conversion types", () => {
 
         unexposedProperty: string;
 
+        constructor(stringProperty: string, booleanProperty: boolean,
+                    numberProperty: number, objectProperty: Nested,
+                    arrayProperty: Nested[], enumProperty: Enum,
+                    unexposedProperty: string) {
+            this.stringProperty = stringProperty;
+            this.booleanProperty = booleanProperty;
+            this.numberProperty = numberProperty;
+            this.objectProperty = objectProperty;
+            this.arrayProperty = arrayProperty;
+            this.enumProperty = enumProperty;
+            this.unexposedProperty = unexposedProperty;
+        }
+
     }
 
-    const nested1 = new Nested();
-    nested1.nestedProperty = "nested 1 value";
-    nested1.nestedUnexposedProperty = "nested 1 unexposed value";
-    const nested2 = new Nested();
-    nested2.nestedProperty = "nested 2 value";
-    nested2.nestedUnexposedProperty = "nested 2 unexposed value";
-    const nested3 = new Nested();
-    nested3.nestedProperty = "nested 3 value";
-    nested3.nestedUnexposedProperty = "nested 3 unexposed value";
-    const test = new Test();
-    test.stringProperty = "value";
-    test.booleanProperty = true;
-    test.numberProperty = 5.12;
-    test.objectProperty = nested1;
-    test.arrayProperty = [nested2, nested3];
-    test.enumProperty = Enum.ENUM_VALUE;
-    test.unexposedProperty = "unexposed value";
+    const nested1 = new Nested("nested 1 value", "nested 1 unexposed value");
+    const nested2 = new Nested("nested 2 value", "nested 2 unexposed value");
+    const nested3 = new Nested("nested 3 value", "nested 3 unexposed value");
+    const test = new Test(
+        "value",
+        true,
+        5.12, nested1,
+        [nested2, nested3],
+        Enum.ENUM_VALUE,
+        "unexposed value"
+    );
     const smokeScreen = new SmokeScreen();
 
     function testResult(result: any, exposedEnumValue: any) {
@@ -70,16 +82,16 @@ describe("Test conversion types", () => {
         expect(result.numberProperty).to.equal(test.numberProperty);
         expect(result.objectProperty.nestedProperty)
             .to.equal(test.objectProperty.nestedProperty);
-        expect(result.objectProperty).to.not.haveOwnProperty("nestedUnexposedProperty");
+        expect(typeof result.objectProperty.nestedUnexposedProperty).to.equal("undefined");
         expect(result.arrayProperty.length).to.equal(test.arrayProperty.length);
         for (let i = 0; i < test.arrayProperty.length; i++) {
             const testNested = test.arrayProperty[i];
             const resultNested = result.arrayProperty[i];
             expect(resultNested.nestedProperty).to.equal(testNested.nestedProperty);
-            expect(resultNested).to.not.haveOwnProperty("nestedUnexposedProperty");
+            expect(typeof resultNested.nestedUnexposedProperty).to.equal("undefined");
         }
         expect(result.enumProperty).to.equal(exposedEnumValue);
-        expect(result).to.not.haveOwnProperty("unexposedProperty");
+        expect(typeof result.unexposedProperty).to.equal("undefined");
     }
 
     it("Test JSON conversion", () => {
@@ -89,7 +101,7 @@ describe("Test conversion types", () => {
         testResult(serializedObject, "ENUM_VALUE");
         const deserialized = smokeScreen.fromJSON(serialized, Test);
         testResult(deserialized, test.enumProperty);
-        const instance = new Test();
+        const instance = new (Test as any)();
         smokeScreen.updateFromJSON(serialized, instance);
         testResult(instance, test.enumProperty);
 
@@ -102,7 +114,7 @@ describe("Test conversion types", () => {
         testResult(serializedObject, "ENUM_VALUE");
         const deserialized = smokeScreen.fromYAML(serialized, Test);
         testResult(deserialized, test.enumProperty);
-        const instance = new Test();
+        const instance = new (Test as any)();
         smokeScreen.updateFromYAML(serialized, instance);
         testResult(instance, test.enumProperty);
 
@@ -114,7 +126,7 @@ describe("Test conversion types", () => {
         testResult(serialized, "ENUM_VALUE");
         const deserialized = smokeScreen.fromObject(serialized, Test);
         testResult(deserialized, test.enumProperty);
-        const instance = new Test();
+        const instance = new (Test as any)();
         smokeScreen.updateFromObject(serialized, instance);
         testResult(instance, test.enumProperty);
 

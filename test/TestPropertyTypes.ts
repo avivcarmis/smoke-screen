@@ -18,12 +18,15 @@ describe("Test property types", () => {
             @exposed({type: String})
             property: string;
 
+            constructor(property: string) {
+                this.property = property;
+            }
+
         }
 
         it("Test serialize", () => {
 
-            const test = new Test();
-            test.property = "value";
+            const test = new Test("value");
             const result = smokeScreen.toObject(test);
             expect(result.property).to.equal("value");
 
@@ -52,12 +55,15 @@ describe("Test property types", () => {
             @exposed({type: Number})
             property: number;
 
+            constructor(property: number) {
+                this.property = property;
+            }
+
         }
 
         it("Test serialize", () => {
 
-            const test = new Test();
-            test.property = 12;
+            const test = new Test(12);
             const result = smokeScreen.toObject(test);
             expect(result.property).to.equal(12);
 
@@ -86,12 +92,15 @@ describe("Test property types", () => {
             @exposed({type: Boolean})
             property: boolean;
 
+            constructor(property: boolean) {
+                this.property = property;
+            }
+
         }
 
         it("Test serialize", () => {
 
-            const test = new Test();
-            test.property = true;
+            const test = new Test(true);
             const result = smokeScreen.toObject(test);
             expect(result.property).to.equal(true);
 
@@ -129,12 +138,15 @@ describe("Test property types", () => {
                 @exposed({type: TestEnum})
                 property: TestEnum;
 
+                constructor(property: TestEnum) {
+                    this.property = property;
+                }
+
             }
 
             it("Test serialize", () => {
 
-                const test = new Test();
-                test.property = TestEnum.FIRST_VALUE;
+                const test = new Test(TestEnum.FIRST_VALUE);
                 const result = smokeScreen.toObject(test);
                 expect(result.property).to.equal("FIRST_VALUE");
 
@@ -167,12 +179,15 @@ describe("Test property types", () => {
                 @exposed({type: new EnumPropertyType(TestEnum, true)})
                 property: TestEnum;
 
+                constructor(property: TestEnum) {
+                    this.property = property;
+                }
+
             }
 
             it("Test serialize", () => {
 
-                const test = new Test();
-                test.property = TestEnum.FIRST_VALUE;
+                const test = new Test(TestEnum.FIRST_VALUE);
                 const result = smokeScreen.toObject(test);
                 expect(result.property).to.equal("FIRST_VALUE");
 
@@ -205,6 +220,10 @@ describe("Test property types", () => {
             @exposed({type: String})
             nestedProperty: string;
 
+            constructor(nestedProperty: string) {
+                this.nestedProperty = nestedProperty;
+            }
+
         }
 
         class Test {
@@ -212,13 +231,15 @@ describe("Test property types", () => {
             @exposed({type: NestedClass})
             property: NestedClass;
 
+            constructor(property: NestedClass) {
+                this.property = property;
+            }
+
         }
 
         it("Test serialize", () => {
 
-            const test = new Test();
-            test.property = new NestedClass();
-            test.property.nestedProperty = "value";
+            const test = new Test(new NestedClass("value"));
             const result = smokeScreen.toObject(test);
             expect(result.property.nestedProperty).to.equal("value");
 
@@ -248,13 +269,17 @@ describe("Test property types", () => {
             @exposed({type: new MapPropertyType(String, String)})
             property: Map<string, string>;
 
+            constructor(property: Map<string, string>) {
+                this.property = property;
+            }
+
         }
 
         it("Test serialize", () => {
 
-            const test = new Test();
-            test.property = new Map();
-            test.property.set("key", "value");
+            const map = new Map();
+            map.set("key", "value");
+            const test = new Test(map);
             const result = smokeScreen.toObject(test);
             expect(result.property.key).to.equal("value");
 
@@ -288,14 +313,18 @@ describe("Test property types", () => {
             @exposed({type: new SetPropertyType(String)})
             property: Set<string>;
 
+            constructor(property: Set<string>) {
+                this.property = property;
+            }
+
         }
 
         it("Test serialize", () => {
 
-            const test = new Test();
-            test.property = new Set();
-            test.property.add("value1");
-            test.property.add("value2");
+            const set = new Set();
+            set.add("value1");
+            set.add("value2");
+            const test = new Test(set);
             const result = smokeScreen.toObject(test);
             expect(result.property).to.deep.equal(["value1", "value2"]);
 
@@ -329,12 +358,15 @@ describe("Test property types", () => {
                 @exposed({type: [String]})
                 property: string[];
 
+                constructor(property: string[]) {
+                    this.property = property;
+                }
+
             }
 
             it("Test serialize", () => {
 
-                const test = new Test();
-                test.property = ["value1", "value2"];
+                const test = new Test(["value1", "value2"]);
                 const result = smokeScreen.toObject(test);
                 expect(result.property).to.deep.equal(test.property);
 
@@ -371,12 +403,15 @@ describe("Test property types", () => {
                 @exposed({type: [TestEnum]})
                 property: TestEnum[];
 
+                constructor(property: TestEnum[]) {
+                    this.property = property;
+                }
+
             }
 
             it("Test serialize", () => {
 
-                const test = new Test();
-                test.property = [TestEnum.FIRST_VALUE, TestEnum.FIRST_VALUE];
+                const test = new Test([TestEnum.FIRST_VALUE, TestEnum.FIRST_VALUE]);
                 const result = smokeScreen.toObject(test);
                 expect(result.property).to.deep.equal(["FIRST_VALUE", "FIRST_VALUE"]);
 
@@ -407,6 +442,10 @@ describe("Test property types", () => {
                 @exposed({type: String})
                 nestedProperty: string;
 
+                constructor(nestedProperty: string) {
+                    this.nestedProperty = nestedProperty;
+                }
+
             }
 
             class Test {
@@ -414,14 +453,19 @@ describe("Test property types", () => {
                 @exposed({type: [NestedClass]})
                 property: NestedClass[];
 
+                constructor(property: NestedClass[]) {
+                    this.property = property;
+                }
+
             }
 
             it("Test serialize", () => {
 
-                const test = new Test();
-                test.property = [new NestedClass(), new NestedClass()];
-                test.property[0].nestedProperty = "value1";
-                test.property[1].nestedProperty = "value2";
+                const property = [
+                    new NestedClass("value1"),
+                    new NestedClass("value2")
+                ];
+                const test = new Test(property);
                 const result = smokeScreen.toObject(test);
                 expect(result.property).to.deep.equal([
                     {nestedProperty: "value1"},

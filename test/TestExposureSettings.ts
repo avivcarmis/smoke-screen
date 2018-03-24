@@ -13,11 +13,14 @@ describe("Test exposure settings", () => {
             @exposed({as: "exposedPropertyName"})
             property: string;
 
+            constructor(property: string) {
+                this.property = property;
+            }
+
         }
 
         const smokeScreen = new SmokeScreen();
-        const test = new Test();
-        test.property = "value";
+        const test = new Test("value");
         const exposure = smokeScreen.toObject(test);
         expect(exposure.exposedPropertyName).to.equal("value");
         expect(exposure).to.not.haveOwnProperty("property");
@@ -53,11 +56,14 @@ describe("Test exposure settings", () => {
                 @exposed({type: testType})
                 property: string;
 
+                constructor(property: string) {
+                    this.property = property;
+                }
+
             }
 
             const smokeScreen = new SmokeScreen();
-            const test = new Test();
-            test.property = "value";
+            const test = new Test("value");
             smokeScreen.toJSON(test);
             expect(testType.visitedOutput).to.equal(true);
             expect(testType.visitedInput).to.equal(false);
@@ -72,6 +78,10 @@ describe("Test exposure settings", () => {
 
                 @exposed({type: testType})
                 property: string;
+
+                constructor(property: string) {
+                    this.property = property;
+                }
 
             }
 
@@ -93,6 +103,10 @@ describe("Test exposure settings", () => {
                 @exposed({validator: value => value + "-suffix"})
                 property: string;
 
+                constructor(property: string) {
+                    this.property = property;
+                }
+
             }
 
             const smokeScreen = new SmokeScreen();
@@ -109,6 +123,10 @@ describe("Test exposure settings", () => {
                     throw new Error("");
                 }})
                 property: string;
+
+                constructor(property: string) {
+                    this.property = property;
+                }
 
             }
 
@@ -128,6 +146,10 @@ describe("Test exposure settings", () => {
 
                 @exposed
                 property: string;
+
+                constructor(property: string) {
+                    this.property = property;
+                }
 
             }
 
@@ -162,6 +184,10 @@ describe("Test exposure settings", () => {
                 @exposed
                 property: string;
 
+                constructor(property: string) {
+                    this.property = property;
+                }
+
             }
 
             const smokeScreen = new SmokeScreen();
@@ -176,6 +202,10 @@ describe("Test exposure settings", () => {
 
                 @exposed({nullable: true})
                 property: string | null;
+
+                constructor(property: string | null) {
+                    this.property = property;
+                }
 
             }
 

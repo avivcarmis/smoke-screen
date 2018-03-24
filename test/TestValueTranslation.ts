@@ -31,10 +31,13 @@ describe("Test value translation", () => {
                 @exposed({type: new TranslatingPropertyType()})
                 property: string;
 
+                constructor(property: string) {
+                    this.property = property;
+                }
+
             }
 
-            const test = new Test();
-            test.property = "value";
+            const test = new Test("value");
             const serialized = smokeScreen.toObject(test);
             expect(serialized.property).to.equal(TRANSLATED_OUTPUT);
             const deserialized = smokeScreen.fromObject(serialized, Test);
@@ -61,10 +64,13 @@ describe("Test value translation", () => {
                 @exposed({type: new TransparentPropertyType()})
                 property: string;
 
+                constructor(property: string) {
+                    this.property = property;
+                }
+
             }
 
-            const test = new Test();
-            test.property = "value";
+            const test = new Test("value");
             const serialized = smokeScreen.toObject(test);
             expect(serialized.property).to.equal(test.property);
             const deserialized = smokeScreen.fromObject(serialized, Test);
@@ -83,6 +89,10 @@ describe("Test value translation", () => {
                 @exposed({validator: _value => TRANSLATED_INPUT})
                 property: string;
 
+                constructor(property: string) {
+                    this.property = property;
+                }
+
             }
 
             const deserialized = smokeScreen.fromObject({property: "value"}, Test);
@@ -98,6 +108,10 @@ describe("Test value translation", () => {
                     return;
                 }})
                 property: string;
+
+                constructor(property: string) {
+                    this.property = property;
+                }
 
             }
 
