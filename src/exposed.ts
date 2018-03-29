@@ -18,8 +18,8 @@ export function exposed(settings?: ExposureSettings): (target: any,
 export function exposed(a: any, b?: string): any {
     function getDecorator(settings: ExposureSettings) {
         return (target: any, propertyKey: string) => {
-            const reflectionMetadata = ReflectionService.extract(target);
-            reflectionMetadata.addProperty(propertyKey, settings);
+            const reflectionService = ReflectionService.forClass(target);
+            reflectionService.addProperty(propertyKey, settings);
         };
     }
     if (b) {

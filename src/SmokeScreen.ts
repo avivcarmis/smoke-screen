@@ -1,9 +1,9 @@
 import {Constructable} from "./Constructable";
 import {ReflectionService} from "./ReflectionService";
-import * as yamlJS from "yamljs";
 import {ExposureSettings} from "./ExposureSettings";
 import {NamingTranslator} from "./NamingTranslator";
 import {parseShortPropertyType, safeDeserialize, safeSerialize} from "./PropertyType";
+import {instanceOfSmokeScreenLifecycle} from "./SmokeScreenLifecycle";
 
 /**
  * The main module interface.
@@ -55,51 +55,20 @@ export class SmokeScreen {
     }
 
     /**
-     * Serializes the given object to a YAML string.
-     * Filtering properties and translating property names and their values if needed.
-     * @param object        object to serialize
-     * @returns {string}    the resulted YAML
-     */
-    toYAML(object: any) {
-        return yamlJS.stringify(this.toObject(object));
-    }
-
-    /**
-     * Deserializes the given YAML string into a fresh instance of the given class and
-     * returns it. Filtering properties, validates and translates the property names and
-     * their values if needed. throws an Error in case of invalid input.
-     * @param {string} yaml                     YAML to deserialize
-     * @param {Constructable<T>} instanceClass  class to deserialize into
-     * @returns {T}                             the resulted instance
-     */
-    fromYAML<T>(yaml: string, instanceClass: Constructable<T>): T {
-        return this.fromObject(yamlJS.parse(yaml), instanceClass);
-    }
-
-    /**
-     * Deserializes the given YAML string into the given instance. Filtering properties,
-     * validates and translates the property names and their values if needed.
-     * throws an Error in case of invalid input.
-     * @param {string} yaml                     YAML to deserialize
-     * @param {Constructable<T>} instanceClass  class to deserialize into
-     * @returns {T}                             the resulted instance
-     */
-    updateFromYAML<T>(yaml: string, instance: T) {
-        this.updateFromObject(yamlJS.parse(yaml), instance);
-    }
-
-    /**
      * Serializes the given object to a generic JS object containing the exposure.
      * Filtering properties and translating property names and their values if needed.
      * @param object                    object to serialize
      * @returns {{[p: string]: any}}    the resulted generic object
      */
     toObject(object: any): {[key: string]: any} {
+        if (instanceOfSmokeScreenLifecycle(object) && object.beforeSerialize) {
+            object.beforeSerialize();
+        }
         const exposure: any = {};
-        const reflectionMetadata = ReflectionService.extract(object);
-        if (reflectionMetadata) {
+        const reflectionService = ReflectionService.forClass(object);
+        if (reflectionService) {
             for (const key of Object.keys(object)) {
-                const exposureSettings = reflectionMetadata.getProperty(key);
+                const exposureSettings = reflectionService.getProperty(key);
                 if (!exposureSettings) {
                     continue;
                 }
@@ -138,10 +107,10 @@ export class SmokeScreen {
      */
     updateFromObject<T>(exposure: {[key: string]: any}, instance: T) {
         const errors = [];
-        const reflectionMetadata = ReflectionService.extract(instance);
-        if (reflectionMetadata) {
-            for (const key of reflectionMetadata.getPropertyKeys()) {
-                const exposureSettings = reflectionMetadata.getProperty(key);
+        const reflectionService = ReflectionService.forClass(instance);
+        if (reflectionService) {
+            for (const key of reflectionService.getPropertyKeys()) {
+                const exposureSettings = reflectionService.getProperty(key);
                 if (!exposureSettings) {
                     continue;
                 }
@@ -186,6 +155,9 @@ export class SmokeScreen {
             if (errors.length > 0) {
                 throw new Error(`illegal input - ${errors.join("; ")}`);
             }
+        }
+        if (instanceOfSmokeScreenLifecycle(instance) && (instance as any).afterDeserialize) {
+            (instance as any).afterDeserialize();
         }
     }
 

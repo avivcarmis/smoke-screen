@@ -1,7 +1,6 @@
 import "mocha";
 import {expect} from "chai";
 import {SmokeScreen} from "../src/SmokeScreen";
-import * as yamlJS from "yamljs";
 import {exposed} from "../src/exposed";
 
 describe("Test conversion types", () => {
@@ -103,19 +102,6 @@ describe("Test conversion types", () => {
         testResult(deserialized, test.enumProperty);
         const instance = new (Test as any)();
         smokeScreen.updateFromJSON(serialized, instance);
-        testResult(instance, test.enumProperty);
-
-    });
-
-    it("Test YAML conversion", () => {
-
-        const serialized = smokeScreen.toYAML(test);
-        const serializedObject = yamlJS.parse(serialized);
-        testResult(serializedObject, "ENUM_VALUE");
-        const deserialized = smokeScreen.fromYAML(serialized, Test);
-        testResult(deserialized, test.enumProperty);
-        const instance = new (Test as any)();
-        smokeScreen.updateFromYAML(serialized, instance);
         testResult(instance, test.enumProperty);
 
     });

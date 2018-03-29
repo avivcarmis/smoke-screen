@@ -7,7 +7,7 @@ Strongly typed validation for JavaScript runtime.
 ## In a Nutshell
 
 Smoke Screen is a lightweight JS library allowing seamless schema validation and class instantiation.
-Smoke Screen is designed to serialize and deserialize JavaScript objects, JSON or YAML string while enforcing validation, and performing property filtering and modification.
+Smoke Screen is designed to serialize and deserialize JavaScript objects and JSON strings while enforcing validation, and performing property filtering and modification.
 
 ## Getting Started
 
@@ -306,6 +306,55 @@ By default, exposed properties are required on deserialization, unless this is s
 - `nullable?: boolean` - May be used to allow the property a null value when 
 deserializing. By default, exposed properties are may not receive null value on deserialization, unless this is set to true.
 
+## Smoke Screen Lifecycle
+
+The `exposed` decorator allows for simple and flexible validation of each property; However, it does not provide any means of validating the entire object. For that end, Smoke Screen provides an additional
+interface `SmokeScreenLifecycle` which allows to register for certain events in the lifecycle of the screening process:
+
+- `beforeSerialize` - To validate an entire object before its being serialized, a zero arguments `beforeSerialize` method must be implemented, validating the object, and throwing an error in case it is not valid.
+- `afterDeserialize` - To validate an entire object after it has been deserialized, a zero arguments `afterDeserialize` method must be implemented, validating the object, and throwing an error in case it is not valid.
+
+```typescript
+// note that it is not required to state `implements SmokeScreenLifecycle`,
+// but merely to implement any of it's methods
+class Person implements SmokeScreenLifecycle {
+
+    @exposed
+    age: number;
+
+    @exposed
+    drinksAlcohol: boolean;
+
+    constructor(age: number, drinksAlcohol: boolean) {
+        this.age = age;
+        this.drinksAlcohol = drinksAlcohol;
+    }
+
+    beforeSerialize() {
+        if (this.age < 18 && this.drinksAlcohol) {
+            throw new Error("invalid during serialization");
+        }
+    }
+
+    afterDeserialize() {
+        if (this.age < 18 && this.drinksAlcohol) {
+            throw new Error("invalid during deserialization");
+        }
+    }
+
+}
+
+const smokeScreen = new SmokeScreen();
+
+// validate on deserialize
+const json = JSON.stringify({age: 17, drinksAlcohol: true});
+smokeScreen.fromJSON(json, Person); // -> Error: invalid during deserialization
+
+// validate on serialize
+const person = new Person(17, true);
+smokeScreen.toJSON(person); // -> Error: invalid during serialization
+```
+
 ## The Smoke Screen Interface
 
 To use Smoke Screen features, e.g. serialization and deserialization, an instance of 
@@ -319,15 +368,6 @@ JSON string into a fresh instance of the given class and returns it.
 Filtering properties, validates and translates the property names and their values if
 needed. throws an Error in case of invalid input.
 - `updateFromJSON<T>(json: string, instance: T): void` - Deserializes the given JSON
-string into the given instance. Filtering properties, validates and translates the 
-property names and their values if needed. throws an Error in case of invalid input.
-- `toYAML(object: any): string` - Serializes the given object to a YAML string. 
-Filtering properties and translating property names and their values if needed.
-- `fromYAML<T>(yaml: string, instanceClass: Constructable<T>): T` - Deserializes the
-given YAML string into a fresh instance of the given class and returns it.
-Filtering properties, validates and translates the property names and their values if
-needed. throws an Error in case of invalid input.
-- `updateFromYAML<T>(yaml: string, instance: T): void` - Deserializes the given YAML
 string into the given instance. Filtering properties, validates and translates the 
 property names and their values if needed. throws an Error in case of invalid input.
 - `toObject(object: any): {[key: string]: any}` - Serializes the given object to a generic

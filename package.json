@@ -1,6 +1,6 @@
 {
   "name": "smoke-screen",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Strongly typed validation for JavaScript runtime",
   "engines": {
     "node": ">=6.11.2"
@@ -16,7 +16,8 @@
     "clean-compile": "npm run clean && npm run compile",
     "lint": "tslint -c tslint.json 'src/**/*.ts' && tslint -c tslint.json 'test/**/*.ts'",
     "test": "mocha dist/test",
-    "build-pipeline": "npm run clean-compile && npm run lint && npm test"
+    "build-pipeline": "npm run clean-compile && npm run lint && npm test",
+    "publish-pipeline": "npm run build-pipeline && npm publish"
   },
   "repository": {
     "type": "git",
@@ -41,13 +42,11 @@
   },
   "homepage": "https://github.com/avivcarmis/smoke-screen#readme",
   "dependencies": {
-    "to-case": "2.0.0",
-    "yamljs": "0.3.0"
+    "to-case": "2.0.0"
   },
   "devDependencies": {
     "@types/chai": "4.0.4",
     "@types/mocha": "2.2.43",
-    "@types/yamljs": "0.2.30",
     "chai": "4.1.2",
     "mocha": "3.5.3",
     "ts-node": "3.3.0",
