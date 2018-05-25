@@ -184,7 +184,7 @@ export namespace PropertyTypes {
                 throw new Error("must be a Map object");
             }
             const exposure: any = {};
-            for (const key of value.keys()) {
+            for (const key of Array.from(value.keys())) {
                 const exposedKey = safeSerialize(this._keyType, smokeScreen, key);
                 exposure[exposedKey] = safeSerialize(this._valueType, smokeScreen, value.get(key));
             }
@@ -223,7 +223,7 @@ export namespace PropertyTypes {
                 throw new Error("must be a Set object");
             }
             const exposure = [];
-            for (const item of value) {
+            for (const item of Array.from(value)) {
                 exposure.push(safeSerialize(this._itemType, smokeScreen, item));
             }
             return exposure;

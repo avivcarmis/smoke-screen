@@ -60,7 +60,12 @@ export class SmokeScreen {
      * @param object                    object to serialize
      * @returns {{[p: string]: any}}    the resulted generic object
      */
-    toObject(object: any): {[key: string]: any} {
+    toObject(object: null): null;
+    toObject(object: any): {[key: string]: any};
+    toObject(object: any): {[key: string]: any} | null {
+        if (object == null) {
+            return null;
+        }
         if (instanceOfSmokeScreenLifecycle(object) && object.beforeSerialize) {
             object.beforeSerialize();
         }
