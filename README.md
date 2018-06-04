@@ -166,23 +166,23 @@ For example:
 ```typescript
 class Pet {
 
-    @exposed({type: StringPropertyType})
+    @exposed({type: new StringPropertyType()})
     name: string;
     
 }
 
 class Person {
 
-    @exposed({type: NumberPropertyType})
+    @exposed({type: new NumberPropertyType()})
     age: number;
     
-    @exposed({type: ArrayPropertyType(ObjectPropertyType(Pet))})
+    @exposed({type: new ArrayPropertyType(new ObjectPropertyType(Pet))})
     pets: Pet[];
     
-    @exposed({type: SetPropertyType(StringPropertyType)})
+    @exposed({type: new SetPropertyType(new StringPropertyType())})
     favoriteFoods: Set<string>;
     
-    @exposed({type: MapPropertyType(StringPropertyType, BooleanPropertyType)})
+    @exposed({type: new MapPropertyType(new StringPropertyType(), new BooleanPropertyType())})
     likesAndDislikes: Map<string, boolean>;
 
 }
@@ -236,10 +236,10 @@ class Person {
     @exposed({type: [String]}) // array and string short writing
     speaks: string[];
     
-    @exposed({type: SetPropertyType(String)}) // string short writing
+    @exposed({type: new SetPropertyType(String)}) // string short writing
     favoriteFoods: Set<string>;
     
-    @exposed({type: MapPropertyType(String, Boolean)}) // string and boolean short writing
+    @exposed({type: new MapPropertyType(String, Boolean)}) // string and boolean short writing
     likesAndDislikes: Map<string, boolean>;
 
 }
